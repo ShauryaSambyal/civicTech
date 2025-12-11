@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+:root {
+	--bg: #f8fafc; /* slate-50 */
+	--card: #ffffff;
+	--text: #111827; /* gray-900 */
+	--muted: #6b7280; /* gray-500 */
+}
+
+.dark {
+	--bg: #0b1220; /* dark background */
+	--card: #0f172a; /* slate-900 */
+	--text: #e6eef8; /* light text */
+	--muted: #94a3b8; /* muted light */
+}
+
+/* Use variables for page background and base text */
+html, body, #root {
+	background-color: var(--bg);
+	color: var(--text);
+}
+
+/* Basic overrides so common Tailwind utility classes adapt in dark mode without changing all components */
+.dark .bg-white { background-color: var(--card) !important; }
+.dark .text-gray-800 { color: var(--text) !important; }
+.dark .text-gray-700 { color: var(--muted) !important; }
+.dark .text-gray-600 { color: var(--muted) !important; }
+.dark .bg-gray-100 { background-color: rgba(255,255,255,0.04) !important; }
+.dark .border-gray-200 { border-color: rgba(255,255,255,0.06) !important; }
+
+/* Make inputs and cards readable in dark */
+.dark input, .dark textarea {
+	background: transparent;
+	color: var(--text);
+	border-color: rgba(255,255,255,0.06);
+}
