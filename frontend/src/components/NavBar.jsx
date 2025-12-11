@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Home, PlusCircle, BarChart3, User, MapPin, Menu, Sun, Moon } from 'lucide-react'
 
 const Navbar = ({ activeTab, setActiveTab, user }) => {
+  const [showMobile, setShowMobile] = useState(false)
   const [theme, setTheme] = useState(() => {
     try {
       return localStorage.getItem('theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
@@ -73,12 +74,31 @@ const Navbar = ({ activeTab, setActiveTab, user }) => {
               <span className="hidden sm:inline text-sm">{theme === 'dark' ? 'Light' : 'Dark'}</span>
             </button>
 
-            <button className="md:hidden">
+            <button
+              className="md:hidden p-2 rounded-lg bg-gray-100 dark:bg-slate-800"
+              onClick={() => setShowMobile(v => !v)}
+              aria-label="Open menu"
+            >
               <Menu className="text-gray-600 dark:text-gray-200" />
             </button>
           </div>
         </div>
       </div>
+      {showMobile && (
+        <div className="md:hidden bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800">
+          <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-2">
+            <button onClick={() => { setActiveTab('home'); setShowMobile(false) }} className={`w-full text-left px-3 py-2 rounded-lg ${activeTab === 'home' ? 'bg-blue-600 text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800'}`}>Home</button>
+            <button onClick={() => { setActiveTab('report'); setShowMobile(false) }} className={`w-full text-left px-3 py-2 rounded-lg ${activeTab === 'report' ? 'bg-blue-600 text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800'}`}>Report Issue</button>
+            <button onClick={() => { setActiveTab('analytics'); setShowMobile(false) }} className={`w-full text-left px-3 py-2 rounded-lg ${activeTab === 'analytics' ? 'bg-blue-600 text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800'}`}>Analytics</button>
+            <div className="pt-2 border-t border-gray-100 dark:border-slate-800 mt-2">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-700 dark:text-gray-200">{user || 'Guest'}</div>
+                <button onClick={() => { setTheme(t => t === 'dark' ? 'light' : 'dark') }} className="px-3 py-2 rounded-lg bg-gray-100 dark:bg-slate-800">Toggle theme</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   )
 }

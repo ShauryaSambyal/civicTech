@@ -17,7 +17,7 @@ export default function HomePage({ issues, setSelectedIssue }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
-      <div className="grid md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-5 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
@@ -98,7 +98,7 @@ export default function HomePage({ issues, setSelectedIssue }) {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredIssues.map(issue => {
           const category = CATEGORIES.find(c => c.id === issue.category);
           const statusConfig = STATUS_CONFIG[issue.status];
@@ -114,7 +114,7 @@ export default function HomePage({ issues, setSelectedIssue }) {
                 <img
                   src={issue.image}
                   alt={issue.title}
-                  className="w-full h-48 object-cover"
+                  className="w-full h-56 md:h-48 lg:h-44 object-cover"
                 />
                 <div className={`absolute top-3 right-3 ${category.color} text-white px-3 py-1 rounded-full text-sm font-semibold`}>
                   {category.icon} {category.name}

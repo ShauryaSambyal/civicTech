@@ -11,16 +11,16 @@ export default function IssueDetailModal({ issue, onClose, onUpvote }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-800">Issue Details</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition">
-            <X size={24} className="text-gray-600" />
+      <div className="bg-white dark:bg-slate-900 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 p-4 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Issue Details</h2>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition">
+            <X size={24} className="text-gray-600 dark:text-gray-200" />
           </button>
         </div>
 
-        <div className="p-6">
-          <img src={issue.image} alt={issue.title} className="w-full h-64 object-cover rounded-lg mb-4" />
+        <div className="p-4 md:p-6">
+          <img src={issue.image} alt={issue.title} className="w-full h-56 md:h-64 object-cover rounded-lg mb-4" />
 
           <div className="flex items-center gap-3 mb-4">
             <div className={`${category.color} text-white px-4 py-2 rounded-full text-sm font-semibold`}>
