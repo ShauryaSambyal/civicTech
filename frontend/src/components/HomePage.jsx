@@ -6,6 +6,17 @@ export default function HomePage({ issues, setSelectedIssue }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [isDark, setIsDark] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'))
+
+  React.useEffect(() => {
+    if (typeof document === 'undefined') return
+    const el = document.documentElement
+    const obs = new MutationObserver(() => {
+      setIsDark(el.classList.contains('dark'))
+    })
+    obs.observe(el, { attributes: true, attributeFilter: ['class'] })
+    return () => obs.disconnect()
+  }, [])
 
   const filteredIssues = issues.filter(issue => {
     const matchesSearch = issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -77,7 +88,7 @@ export default function HomePage({ issues, setSelectedIssue }) {
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${isDark ? 'bg-slate-800 text-gray-100 border-slate-700' : 'bg-white text-gray-700 border-gray-300'}`}
           >
             <option value="all">All Categories</option>
             {CATEGORIES.map(cat => (
@@ -88,7 +99,7 @@ export default function HomePage({ issues, setSelectedIssue }) {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${isDark ? 'bg-slate-800 text-gray-100 border-slate-700' : 'bg-white text-gray-700 border-gray-300'}`}
           >
             <option value="all">All Status</option>
             <option value="reported">Reported</option>
