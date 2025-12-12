@@ -5,6 +5,8 @@
 	--card: #ffffff;
 	--text: #111827; /* gray-900 */
 	--muted: #6b7280; /* gray-500 */
+	--scroll-thumb: rgba(17,24,39,0.12);
+	--scroll-track: transparent;
 }
 
 .dark {
@@ -12,6 +14,8 @@
 	--card: #0f172a; /* slate-900 */
 	--text: #e6eef8; /* light text */
 	--muted: #94a3b8; /* muted light */
+	--scroll-thumb: rgba(226,238,248,0.12);
+	--scroll-track: transparent;
 }
 
 /* Use variables for page background and base text */
@@ -34,3 +38,23 @@ html, body, #root {
 	color: var(--text);
 	border-color: rgba(255,255,255,0.06);
 }
+
+/* Theme-aware custom scrollbar for modal */
+.modal-scroll {
+	scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+	scrollbar-width: thin;
+}
+.modal-scroll::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+.modal-scroll::-webkit-scrollbar-track {
+	background: var(--scroll-track);
+}
+.modal-scroll::-webkit-scrollbar-thumb {
+	background-color: var(--scroll-thumb);
+	border-radius: 9999px;
+	border: 2px solid transparent;
+	background-clip: padding-box;
+}
+
