@@ -26,7 +26,7 @@ const Navbar = ({ activeTab, setActiveTab, user }) => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-2">
             <MapPin className="text-blue-600" size={28} />
-            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">CivicReport</h1>
+            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">Civic Tech</h1>
           </div>
           
           <div className="hidden md:flex gap-6">
