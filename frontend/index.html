@@ -1,10 +1,46 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Civic Tech</title>
+    <meta name="description" content="CivicTech — report, track and resolve local civic issues together." />
+    <meta name="theme-color" content="#08090a" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f7f7f5" media="(prefers-color-scheme: light)" />
+    <title>CivicTech — Report. Track. Resolve.</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!--
+      Paint the correct theme before the first frame so there is no flash, and
+      flag motion availability. `.motion` is what arms every animation's
+      "before" state in CSS, so if JS is off — or the visitor asked for reduced
+      motion — the page renders fully visible and static instead.
+    -->
+    <script>
+      (function () {
+        var root = document.documentElement;
+        try {
+          var stored = localStorage.getItem('theme');
+          var theme = stored === 'light' || stored === 'dark' ? stored : 'dark';
+          root.classList.toggle('dark', theme === 'dark');
+          root.style.backgroundColor = theme === 'dark' ? '#08090a' : '#f7f7f5';
+        } catch (e) {
+          root.classList.add('dark');
+        }
+        try {
+          var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          root.classList.toggle('motion', !reduced);
+        } catch (e) {
+          /* no matchMedia: leave motion off */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
