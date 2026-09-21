@@ -1,28 +1,40 @@
 import React, { useState } from 'react';
-import { Search, X } from 'lucide-react';
-import { CATEGORIES, STATUS_CONFIG, STATUS_ORDER, findCategory, issueRef } from './constants';
+import { ArrowUp, Search, X } from 'lucide-react';
+import { CATEGORIES, STATUS_CONFIG, STATUS_ORDER, findCategory, hasLiked } from './constants';
 import { useReveal, useStaggerIn } from '../hooks/useMotion';
 
-function IssueCard({ issue, onOpen }) {
+/**
+ * One report in the grid.
+ *
+ * The card is an `<article>`, not a button: a single transparent overlay
+ * button provides "open the report" across the whole surface, and the backing
+ * control sits above it in the stacking order. That keeps the whole card
+ * clickable without nesting a button inside a button, which is what a
+ * role="button" wrapper would have forced.
+ */
+function IssueCard({ issue, user, onOpen, onToggleLike, onRequestSignIn }) {
   const [loaded, setLoaded] = useState(false);
   const category = findCategory(issue.category);
   const status = STATUS_CONFIG[issue.status];
+  const liked = hasLiked(issue, user?.uid);
 
-  const activate = () => onOpen(issue);
+  const handleBack = () => {
+    if (!user) {
+      onRequestSignIn('Backing a report');
+      return;
+    }
+    onToggleLike(issue);
+  };
 
   return (
-    <article
-      role="button"
-      tabIndex={0}
-      onClick={activate}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          activate();
-        }
-      }}
-      className="surface panel-interactive media-grey group flex flex-col overflow-hidden text-left"
-    >
+    <article className="surface panel-interactive media-grey group relative flex flex-col overflow-hidden text-left">
+      <button
+        type="button"
+        onClick={() => onOpen(issue)}
+        aria-label={`Open ${issue.code}: ${issue.title}`}
+        className="card-open"
+      />
+
       <div className="relative aspect-[16/10] overflow-hidden" style={{ backgroundColor: 'var(--surface)' }}>
         <img
           src={issue.image}
@@ -53,7 +65,7 @@ function IssueCard({ issue, onOpen }) {
           className="tabular"
           style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-faint)', letterSpacing: '0.14em' }}
         >
-          {issueRef(issue.id)}
+          {issue.code}
         </span>
 
         <h3 className="text-body mt-2.5" style={{ fontSize: 'var(--fs-h3)', letterSpacing: '-0.02em' }}>
@@ -70,9 +82,17 @@ function IssueCard({ issue, onOpen }) {
             {status.label}
           </span>
 
-          <span className="tabular" style={{ fontSize: 'var(--fs-small)', color: 'var(--ink-muted)' }}>
-            {issue.upvotes} <span style={{ color: 'var(--ink-faint)' }}>upvotes</span>
-          </span>
+          <button
+            type="button"
+            onClick={handleBack}
+            aria-pressed={liked}
+            aria-label={liked ? `Remove your backing from ${issue.code}` : `Back ${issue.code}`}
+            className="back-btn"
+            data-backed={liked ? 'true' : 'false'}
+          >
+            <ArrowUp size={13} strokeWidth={2.2} aria-hidden="true" />
+            <span className="tabular">{issue.upvotes}</span>
+          </button>
         </div>
 
         <p className="text-faint mt-3 line-clamp-1" style={{ fontSize: 'var(--fs-small)' }}>
@@ -87,7 +107,18 @@ function IssueCard({ issue, onOpen }) {
  * Section 02. The registry: a quiet filter bar over a grid of hairline panels.
  * Media is monochrome until hover — the one signature image move in the system.
  */
-export default function IssuesSection({ index, label, issues, setSelectedIssue }) {
+export default function IssuesSection({
+  index,
+  label,
+  issues,
+  loading,
+  error,
+  user,
+  onOpenIssue,
+  onToggleLike,
+  onRequestSignIn,
+  onSeed
+}) {
   const ref = useReveal();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
@@ -125,8 +156,8 @@ export default function IssuesSection({ index, label, issues, setSelectedIssue }
             </h2>
           </div>
           <p className="lead md:text-right md:max-w-[26rem] md:flex-shrink-0" data-anim="fade-up">
-            Everything reported in this ward, newest first. Search it, filter it, and open a
-            report to back it with an upvote.
+            Everything reported in this ward, newest first. Search it, filter it, and back the
+            problems you live with.
           </p>
         </div>
 
@@ -194,11 +225,49 @@ export default function IssuesSection({ index, label, issues, setSelectedIssue }
             {String(filtered.length).padStart(2, '0')} / {String(issues.length).padStart(2, '0')} REPORTS SHOWN
           </p>
 
+          {error && (
+            <p className="mt-3" style={{ fontSize: 'var(--fs-small)', color: 'var(--accent)' }} role="status">
+              {error}
+            </p>
+          )}
+
           {/* Grid */}
-          {filtered.length > 0 ? (
+          {loading ? (
+            <div className="surface mt-6 flex flex-col items-start px-6 py-14 sm:px-10">
+              <span className="eyebrow">Loading the registry</span>
+              <p className="text-soft mt-4" style={{ fontSize: 'var(--fs-small)' }}>
+                Fetching reports from the live registry.
+              </p>
+            </div>
+          ) : issues.length === 0 ? (
+            /* A brand new registry, not a filtered-out one. */
+            <div className="surface mt-6 flex flex-col items-start px-6 py-14 sm:px-10" data-anim="fade-up">
+              <span className="eyebrow">Empty registry</span>
+              <h3 className="text-body mt-4" style={{ fontSize: '1.375rem' }}>
+                Nothing has been reported here yet.
+              </h3>
+              <p className="text-soft mt-3 measure" style={{ fontSize: 'var(--fs-small)' }}>
+                Be the first. Reports are public the moment they are filed, and anyone who lives
+                with the same problem can back them.
+              </p>
+              <div className="mt-7 flex flex-wrap items-center gap-3">
+                <a href="#report" className="btn btn-primary">Report an issue</a>
+                <button type="button" onClick={onSeed} className="btn btn-ghost">
+                  Load example reports
+                </button>
+              </div>
+            </div>
+          ) : filtered.length > 0 ? (
             <div ref={gridRef} data-anim="stagger" className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
               {filtered.map((issue) => (
-                <IssueCard key={issue.id} issue={issue} onOpen={setSelectedIssue} />
+                <IssueCard
+                  key={issue.id}
+                  issue={issue}
+                  user={user}
+                  onOpen={onOpenIssue}
+                  onToggleLike={onToggleLike}
+                  onRequestSignIn={onRequestSignIn}
+                />
               ))}
             </div>
           ) : (

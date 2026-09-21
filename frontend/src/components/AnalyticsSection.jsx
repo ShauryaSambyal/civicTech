@@ -206,7 +206,7 @@ export default function AnalyticsSection({ index, label, issues }) {
         <div className="stat-strip mt-5" data-anim="stagger">
           <Figure label="Reports on record" value={issues.length} />
           <Figure label="Resolution rate" value={resolutionRate} suffix="%" />
-          <Figure label="Most upvoted" value={mostUpvoted} />
+          <Figure label="Most backed" value={mostUpvoted} />
           <Figure label="Contributors" value={activeCitizens} />
         </div>
       </div>

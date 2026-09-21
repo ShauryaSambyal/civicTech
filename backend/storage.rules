@@ -1,0 +1,33 @@
+rules_version = '2';
+
+// ============================================================
+// CivicTech — Cloud Storage rules
+//
+// Report photographs are public, because the registry is. Writes
+// are not: a photo may only be uploaded into the uploader's own
+// folder, it must be an image, and it must be under 5MB — the same
+// ceiling the form states and the client enforces.
+//
+// Deploy with:  firebase deploy --only storage
+// ============================================================
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    match /issues/{uid}/{fileName} {
+      allow read: if true;
+
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Everything else in the bucket stays private.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

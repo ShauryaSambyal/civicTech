@@ -1,14 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X } from 'lucide-react';
+import { ArrowUp, Trash2, X } from 'lucide-react';
 import { animate, createTimeline, stagger, utils } from 'animejs';
-import { STATUS_CONFIG, findCategory, issueRef } from './constants';
+import { STATUS_CONFIG, findCategory, hasLiked } from './constants';
 import { DUR, EASE, STAGGER, motionEnabled } from '../lib/motion';
 import { startScroll, stopScroll } from '../hooks/useSmoothScroll';
 
-export default function IssueDetailModal({ issue, onClose, onUpvote }) {
+export default function IssueDetailModal({
+  issue,
+  user,
+  onClose,
+  onToggleLike,
+  onWithdraw,
+  onRequestSignIn
+}) {
   const [burstKey, setBurstKey] = useState(0);
+  // Which report the withdrawal confirmation is open for. Held as an id rather
+  // than a boolean so that it is impossible for a stale prompt to survive a
+  // switch to a different report.
+  const [confirmingId, setConfirmingId] = useState(null);
   const backdropRef = useRef(null);
   const panelRef = useRef(null);
+
+  const isMine = Boolean(issue && user && issue.authorId === user.uid);
 
   // Escape to close + lock the page behind the modal.
   useEffect(() => {
@@ -54,20 +67,29 @@ export default function IssueDetailModal({ issue, onClose, onUpvote }) {
       );
   }, [issue]);
 
-  /* A small confirmation pulse when an upvote lands. */
-  const handleUpvote = () => {
+  /* A small confirmation pulse when a backing lands. */
+  const handleBack = () => {
+    if (!user) {
+      onRequestSignIn('Backing a report');
+      return;
+    }
     setBurstKey((key) => key + 1);
-    onUpvote(issue.id);
+    onToggleLike(issue);
   };
 
   if (!issue) return null;
 
+  const confirmingWithdraw = confirmingId === issue.id;
   const category = findCategory(issue.category);
   const status = STATUS_CONFIG[issue.status];
+  const liked = hasLiked(issue, user?.uid);
 
   const meta = [
     { label: 'Location', value: issue.location.address },
-    { label: 'Reported by', value: issue.reportedBy },
+    {
+      label: 'Reported by',
+      value: isMine ? `${issue.reportedBy} — you` : issue.reportedBy
+    },
     {
       label: 'Filed on',
       value: new Date(issue.createdAt).toLocaleDateString(undefined, {
@@ -121,7 +143,7 @@ export default function IssueDetailModal({ issue, onClose, onUpvote }) {
               className="tabular"
               style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-faint)', letterSpacing: '0.16em' }}
             >
-              {issueRef(issue.id)} · {category.code}
+              {issue.code} · {category.code}
             </span>
             <h2 className="text-body mt-2.5" style={{ fontSize: 'clamp(1.375rem, 3vw, 1.875rem)' }}>
               {issue.title}
@@ -153,10 +175,50 @@ export default function IssueDetailModal({ issue, onClose, onUpvote }) {
             ))}
           </dl>
 
+          {/* Whoever filed it can take it back — but only after saying so twice. */}
+          {isMine && (
+            <div
+              className="mt-8 pt-6"
+              style={{ borderTop: '1px solid var(--rule)' }}
+              data-modal-row
+            >
+              {confirmingWithdraw ? (
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-soft" style={{ fontSize: 'var(--fs-small)' }}>
+                    Withdraw {issue.code}? It comes off the registry for everyone, along with every
+                    backing on it.
+                  </p>
+                  <div className="flex shrink-0 items-center gap-3">
+                    <button type="button" onClick={() => setConfirmingId(null)} className="btn btn-ghost">
+                      Keep it
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onWithdraw(issue)}
+                      className="btn btn-primary"
+                    >
+                      Withdraw
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setConfirmingId(issue.id)}
+                  className="btn btn-ghost"
+                >
+                  <Trash2 size={13} strokeWidth={1.8} aria-hidden="true" />
+                  Withdraw this report
+                </button>
+              )}
+            </div>
+          )}
+
           <div className="mt-8 pt-6" style={{ borderTop: '1px solid var(--rule)' }} data-modal-row>
             <button
               type="button"
-              onClick={handleUpvote}
+              onClick={handleBack}
+              aria-pressed={liked}
               className="btn btn-primary w-full"
               style={{ paddingBlock: '0.9rem' }}
             >
@@ -169,13 +231,18 @@ export default function IssueDetailModal({ issue, onClose, onUpvote }) {
                     style={{ backgroundColor: 'currentColor', opacity: 0.4 }}
                   />
                 )}
-                <span className="relative">Upvote this report</span>
+                <span className="relative flex items-center gap-2">
+                  <ArrowUp size={14} strokeWidth={2.2} aria-hidden="true" />
+                  {liked ? 'Backing this — undo' : 'Back this report'}
+                </span>
               </span>
               <span className="tabular" style={{ opacity: 0.7 }}>{issue.upvotes}</span>
             </button>
 
             <p className="text-faint mt-4" style={{ fontSize: 'var(--fs-small)' }}>
-              Upvotes tell the ward team which problems matter most to the people living with them.
+              {user
+                ? 'Backings tell the ward team which problems matter most to the people living with them. One per account, and they are tied to you.'
+                : 'Sign in to back this report. Backings tell the ward team which problems matter most to the people living with them.'}
             </p>
           </div>
         </div>

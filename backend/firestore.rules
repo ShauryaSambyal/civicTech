@@ -1,0 +1,108 @@
+rules_version = '2';
+
+// ============================================================
+// CivicTech — Firestore rules
+//
+// The registry is public to read and strictly owned to write.
+// Anyone may see every report; only a signed-in resident may file
+// one, only as themselves; anyone signed in may back a report, but
+// only by touching the backing fields; and only the account that
+// filed a report may change or withdraw it.
+//
+// Deploy with:  firebase deploy --only firestore:rules
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAuthor() {
+      return signedIn() && resource.data.authorId == request.auth.uid;
+    }
+
+    // The fields a backing is allowed to move, and nothing else.
+    function onlyBackingChanged() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['likedBy', 'upvotes']);
+    }
+
+    // The fields nobody may rewrite after filing.
+    function authorFieldsUntouched() {
+      return !request.resource.data.diff(resource.data).affectedKeys()
+        .hasAny(['authorId', 'authorName', 'authorPhoto', 'createdAt', 'code']);
+    }
+
+    function validIssue(data) {
+      return data.code is string
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 140
+        && data.description is string && data.description.size() > 0 && data.description.size() <= 2000
+        && data.category in ['roads', 'sanitation', 'electricity', 'water', 'drainage', 'other']
+        && data.status in ['reported', 'in-progress', 'resolved']
+        && data.upvotes == 0
+        && data.likedBy == [];
+    }
+
+    // A backing may only ever add or remove the caller's own uid, and the
+    // count has to move with it — so the tally can never drift from the list.
+    function validBackingChange() {
+      let before = resource.data.get('likedBy', []);
+      let after = request.resource.data.likedBy;
+      let added = after.removeAll(before);
+      let removed = before.removeAll(after);
+
+      return request.resource.data.likedBy is list
+        && after.size() <= 10000
+        && request.resource.data.upvotes is int
+        && request.resource.data.upvotes >= 0
+        && (
+          (added.size() == 1 && removed.size() == 0
+            && added[0] == request.auth.uid
+            && request.resource.data.upvotes == resource.data.get('upvotes', 0) + 1)
+          ||
+          (removed.size() == 1 && added.size() == 0
+            && removed[0] == request.auth.uid
+            && request.resource.data.upvotes == math.max(0, resource.data.get('upvotes', 0) - 1))
+        );
+    }
+
+    match /issues/{issueId} {
+      // The registry is public — that is the whole point of it.
+      allow read: if true;
+
+      allow create: if signedIn()
+        && request.resource.data.authorId == request.auth.uid
+        && validIssue(request.resource.data);
+
+      // Either someone is backing this report, or the author is editing it.
+      allow update: if signedIn()
+        && (validBackingChange() || (isAuthor() && authorFieldsUntouched()));
+
+      allow delete: if isAuthor();
+    }
+
+    // Sequential public reference codes (ISS-0001, ISS-0002 …). Any signed-in
+    // resident may advance the counter, but by exactly one at a time.
+    match /counters/{counterId} {
+      allow read: if true;
+
+      allow create: if signedIn()
+        && request.resource.data.seq is int
+        && request.resource.data.seq >= 1
+        && request.resource.data.seq <= 1000000;
+
+      allow update: if signedIn()
+        && request.resource.data.seq is int
+        && request.resource.data.seq == resource.data.seq + 1;
+
+      allow delete: if false;
+    }
+
+    // Nothing else in this database is reachable from a client.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

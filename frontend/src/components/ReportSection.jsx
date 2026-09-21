@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Camera, Check, Crosshair, Loader2, MapPin, X } from 'lucide-react';
 import { CATEGORIES } from './constants';
 import { useReveal } from '../hooks/useMotion';
@@ -10,8 +10,14 @@ const EMPTY_FORM = { title: '', description: '', category: '', location: '', ima
  * Section 03. A single-column form on a hairline panel. Field labels are
  * monospace instrumentation labels; validation speaks in accent-coloured text,
  * never in a red block.
+ *
+ * The form is always visible — an account is required to FILE, not to type.
+ * A signed-out visitor can write the whole report and is asked to sign in when
+ * they submit; the draft is held, and the moment the session lands the report
+ * files itself. Hiding the form behind a sign-in wall was tried and was wrong:
+ * it punished the visitor who had not signed in yet.
  */
-export default function ReportSection({ index, label, onSubmit }) {
+export default function ReportSection({ index, label, onSubmit, user, loading, onRequestSignIn }) {
   const ref = useReveal();
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [imagePreview, setImagePreview] = useState(null);
@@ -20,6 +26,10 @@ export default function ReportSection({ index, label, onSubmit }) {
   const [isDragging, setIsDragging] = useState(false);
   const [errors, setErrors] = useState({});
   const fileInputRef = useRef(null);
+
+  // The draft held while the submitter signs in. A ref, not state: it must not
+  // re-render the form, and it must survive the modal opening over it.
+  const heldDraftRef = useRef(null);
 
   const readFile = (file) => {
     if (!file) return;
@@ -51,24 +61,52 @@ export default function ReportSection({ index, label, onSubmit }) {
     return Object.keys(next).length === 0;
   };
 
-  const handleSubmit = (event) => {
+  /** Sends the draft. The caller owns the write and reports its own failure;
+      the form clears itself only once the report is actually on the registry. */
+  const fileDraft = async (draft) => {
+    setIsSubmitting(true);
+    const createdId = await onSubmit(draft);
+    setIsSubmitting(false);
+
+    if (!createdId) return;
+
+    setFormData(EMPTY_FORM);
+    setImagePreview(null);
+    setErrors({});
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    if (isSubmitting) return;
     if (!validate()) {
       toast.error('Some required fields are still empty.');
       return;
     }
 
-    setIsSubmitting(true);
-    setTimeout(() => {
-      onSubmit(formData);
-      setIsSubmitting(false);
-      setFormData(EMPTY_FORM);
-      setImagePreview(null);
-      setErrors({});
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      toast.success('Report filed — it is on the registry now.');
-    }, 900);
+    if (!user) {
+      if (loading) {
+        toast.info('Still checking your session — try again in a moment.');
+        return;
+      }
+      // Hold what they wrote and ask for the account. Filing resumes the
+      // moment the session arrives (the effect below).
+      heldDraftRef.current = formData;
+      onRequestSignIn('Filing a report');
+      return;
+    }
+
+    fileDraft(formData);
   };
+
+  /* The session arriving after a gated submit: file the held report now. */
+  useEffect(() => {
+    if (!user || !heldDraftRef.current) return;
+    const held = heldDraftRef.current;
+    heldDraftRef.current = null;
+    fileDraft(held);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- filing the held draft is a one-shot response to the session arriving
+  }, [user]);
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
@@ -306,7 +344,14 @@ export default function ReportSection({ index, label, onSubmit }) {
                   Reports are public on the registry. Never include personal details.
                 </p>
                 <button type="submit" disabled={isSubmitting} className="btn btn-primary shrink-0">
-                  {isSubmitting ? 'Filing…' : 'Submit report'}
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={14} strokeWidth={2} className="anim-spin-slow" style={{ animationDuration: '0.9s' }} aria-hidden="true" />
+                      Filing…
+                    </>
+                  ) : (
+                    'Submit report'
+                  )}
                 </button>
               </div>
             </form>

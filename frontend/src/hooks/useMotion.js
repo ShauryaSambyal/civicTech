@@ -5,6 +5,7 @@ import {
   EASE,
   STAGGER,
   canHover,
+  framesFlowing,
   headlineTargets,
   motionEnabled,
   revealNow
@@ -43,7 +44,13 @@ export function useReveal() {
     const play = () => {
       if (played) return;
       played = true;
-      buildTimeline(node);
+      // If frames are not flowing (background tab, throttled webview), an
+      // anime timeline would freeze at its hidden "before" state. Show the
+      // section statically instead — content beats choreography.
+      framesFlowing().then((flowing) => {
+        if (flowing) buildTimeline(node);
+        else revealNow(node);
+      });
     };
 
     if (typeof IntersectionObserver === 'undefined') {

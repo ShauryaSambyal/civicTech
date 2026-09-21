@@ -729,6 +729,93 @@ textarea.field {
 }
 
 /* ------------------------------------------------------------
+   12b. Account, auth and the backing control
+   ------------------------------------------------------------ */
+/* Makes the whole report card openable from one transparent overlay button.
+   The card cannot be a <button> itself: the backing control lives inside it,
+   and a button inside a button is invalid. */
+.card-open {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	border-radius: inherit;
+}
+
+.card-open:focus-visible {
+	outline: 1px solid var(--accent);
+	outline-offset: -1px;
+}
+
+/* The backing control: a count that changes state, never a coloured badge. */
+.back-btn {
+	position: relative;
+	z-index: 2;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.3rem 0.6rem;
+	border: 1px solid var(--rule);
+	border-radius: var(--radius-pill);
+	background-color: transparent;
+	color: var(--ink-muted);
+	font-size: var(--fs-small);
+	cursor: pointer;
+	transition: color var(--dur-micro) var(--ease-out),
+		border-color var(--dur-micro) var(--ease-out),
+		background-color var(--dur-micro) var(--ease-out);
+}
+
+.back-btn:hover {
+	color: var(--ink);
+	border-color: var(--rule-strong);
+}
+
+.back-btn:focus-visible {
+	outline: 1px solid var(--accent);
+	outline-offset: 2px;
+}
+
+.back-btn[data-backed="true"] {
+	color: var(--accent);
+	border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+	background-color: var(--accent-soft);
+}
+
+/* Account dropdown — the only other floating surface in the system. */
+.menu {
+	z-index: 60;
+	background-color: var(--bg-2);
+	border: 1px solid var(--rule);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow-overlay);
+}
+
+.menu-item {
+	display: flex;
+	width: 100%;
+	align-items: center;
+	gap: 0.6rem;
+	padding: 0.6rem 0.75rem;
+	border-radius: var(--radius);
+	color: var(--ink-muted);
+	font-size: var(--fs-small);
+	text-align: left;
+	cursor: pointer;
+	transition: background-color var(--dur-micro) var(--ease-out),
+		color var(--dur-micro) var(--ease-out);
+}
+
+.menu-item:hover {
+	background-color: var(--surface-hover);
+	color: var(--ink);
+}
+
+.menu-item:focus-visible {
+	outline: 1px solid var(--accent);
+	outline-offset: -1px;
+}
+
+/* ------------------------------------------------------------
    13. Misc
    ------------------------------------------------------------ */
 .line-clamp-1 {

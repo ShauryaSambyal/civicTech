@@ -66,6 +66,32 @@ export function headlineTargets(el) {
 }
 
 /**
+ * True when the page is actually receiving animation frames.
+ *
+ * A background tab, an occluded webview or a power-saving browser pauses
+ * requestAnimationFrame. Building an anime timeline in that state leaves every
+ * reveal frozen at its hidden "before" state until frames resume — which can be
+ * forever. The reveal engine probes this before animating and falls back to
+ * showing the section statically when the page is being starved.
+ */
+export function framesFlowing(deadlineMs = 120) {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined' || typeof window.requestAnimationFrame !== 'function') {
+      resolve(false);
+      return;
+    }
+    let settled = false;
+    const finish = (flowing) => {
+      if (settled) return;
+      settled = true;
+      resolve(flowing);
+    };
+    window.requestAnimationFrame(() => finish(true));
+    setTimeout(() => finish(false), deadlineMs);
+  });
+}
+
+/**
  * Skips an element's future animation: clears the CSS-hidden state anime would
  * otherwise never restore (used when a section is revealed before/without an
  * observer).

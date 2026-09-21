@@ -1,0 +1,17 @@
+{
+  "name": "civictech-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Firebase configuration for CivicTech: security rules, CLI config and environment. No server code — the browser talks to Firebase directly.",
+  "scripts": {
+    "login": "firebase login",
+    "use": "firebase use --add",
+    "deploy:rules": "firebase deploy --only firestore:rules,storage",
+    "deploy:indexes": "firebase deploy --only firestore:indexes",
+    "deploy": "firebase deploy --only firestore:rules,storage,firestore:indexes",
+    "emulators": "firebase emulators:start"
+  },
+  "devDependencies": {
+    "firebase-tools": "^14"
+  }
+}

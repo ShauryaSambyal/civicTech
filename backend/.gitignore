@@ -1,0 +1,44 @@
+# ============================================================
+# CivicTech backend — Firebase configuration
+#
+# This folder holds everything that configures the backend:
+# the Firebase CLI config, the security rules that are the app's
+# real boundary, and the environment files the frontend reads.
+# No server code — the browser talks to Firebase directly.
+#
+#   firebase.json            CLI config (rules deploy, emulators)
+#   firestore.rules          Firestore security rules
+#   firestore.indexes.json   Composite index manifest (empty on purpose)
+#   storage.rules            Cloud Storage security rules
+#   .env.example             Committed template of every variable
+#   .env                     Your real values — GITIGNORED, never commit
+#
+# The frontend dev server reads .env from this folder (see
+# frontend/vite.config.js -> envDir). Fill in .env, then restart Vite.
+# ============================================================
+
+# Environment — real values never enter the repo.
+.env
+.env.*
+!.env.example
+
+# Firebase CLI local state and logs
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+*.log
+
+# Service accounts and admin keys must NEVER be committed — and must
+# never be named VITE_* either, or Vite would inline them into the
+# browser bundle.
+serviceAccount*.json
+*service-account*.json
+*-firebase-adminsdk-*.json
+*.pem
+*.key
+
+# Editor directories and files
+.vscode/*
+.idea
+.DS_Store

@@ -12,6 +12,18 @@ dist
 dist-ssr
 *.local
 
+# Environment — real values never enter the repo. `.env.example` is the
+# committed template and is re-included below on purpose.
+.env
+.env.*
+!.env.example
+
+# Firebase CLI local state
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

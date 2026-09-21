@@ -66,7 +66,7 @@ Design moves worth naming, because they are the whole style:
 
 ---
 
-## 2. One page, four sections
+## 2. One page, five sections
 
 The product is a **single scrolling page**. There is no router, no page switching,
 and no per-page layout. Navigation scrolls to a section; nothing unmounts.
@@ -74,9 +74,10 @@ and no per-page layout. Navigation scrolls to a section; nothing unmounts.
 | # | Section id | Label | Contents |
 | - | ---------- | ----- | -------- |
 | 01 | `#overview` | Overview | Statement hero, live civic metrics strip |
-| 02 | `#issues` | Registry | Search + filters, issue grid, detail modal |
-| 03 | `#report` | Report | Report-an-issue form |
+| 02 | `#issues` | Registry | Search + filters, issue grid, backing control, detail modal |
+| 03 | `#report` | Report | Report-an-issue form (behind the account) |
 | 04 | `#analytics` | Analytics | Category/status breakdown, resolution ring, quick stats |
+| 05 | `#account` | Account | Identity strip, own figures, filed and backed lists |
 
 Rules:
 
@@ -270,6 +271,39 @@ hover = border/colour shift only.
 
 ---
 
+### Backing control
+- A report is **backed**, not upvoted. The control is a pill: a 13px arrow plus the
+  count in mono. Backed state is `--accent` text on an `--accent-soft` fill with a
+  `color-mix` accent hairline. Never a filled badge, never a heart.
+- One backing per account, enforced by the database (see §10), so the control is a
+  toggle — pressing it again withdraws the backing.
+- It is `aria-pressed` and its label says which way the press will go
+  ("Back ISS-0007" / "Remove your backing from ISS-0007").
+- On a card, the backing pill sits above a transparent overlay button that opens
+  the report. The card is an `<article>`, never a `<button>`: a button inside a
+  button is invalid, and the pill has to stay independently pressable.
+
+### Account surfaces
+- The header control is the avatar — a 28px square, 2px radius, 1px
+  `--rule-strong`, initials when there is no Google photo — then the first name and
+  a chevron. Signed out it is a single ghost "Sign in" button; while the session
+  resolves it is a hairline square.
+- The dropdown (`.menu`) is the only floating surface besides the modal: `--bg-2`,
+  1px `--rule`, `--radius`, `--shadow-overlay`. Its header is the name and email,
+  then a two-cell hairline strip of Filed / Backed, then the actions.
+- Google's mark is drawn in `currentColor`, not in its four brand colours. The
+  one-accent rule wins over brand fidelity; the silhouette is unchanged.
+- Section 05 is the account's own material: identity strip, four figures, then two
+  hairline lists. A row is a `<button>` for the report plus a sibling icon button
+  for withdrawal — never nested.
+- Withdrawal is destructive, so it is two-step inside the modal: the first press
+  replaces the button with the consequence and Keep it / Withdraw.
+- Failure copy is a single accent line phrased as something to do. Firebase error
+  codes are translated in `lib/firebaseErrors.js`; a raw SDK code never reaches the
+  interface.
+
+---
+
 ## 7. Motion
 
 Two libraries, one vocabulary:
@@ -395,11 +429,73 @@ looking somewhere else on the page.
 | Toasts (host) | `frontend/src/components/Toast.jsx` |
 | Toast bus (framework-free) | `frontend/src/components/toastBus.js` |
 | Magnetic pointer wrapper | `frontend/src/components/Magnetic.jsx` |
-| Category & status taxonomy | `frontend/src/components/constants.js` |
+| Category & status taxonomy, seed, section registry | `frontend/src/components/constants.js` |
+| Firebase bootstrap (env-driven, local fallback) | `frontend/src/lib/firebase.js` |
+| Registry facade — Firestore and local behind one API | `frontend/src/lib/registry.js` |
+| Local-session registry (localStorage) | `frontend/src/lib/localRegistry.js` |
+| Firebase error code → sentence | `frontend/src/lib/firebaseErrors.js` |
+| Session provider (Google sign-in/out) | `frontend/src/components/AuthProvider.jsx` |
+| Auth context + `useAuth()` | `frontend/src/hooks/useAuth.js` |
+| Live registry subscription + every write | `frontend/src/hooks/useRegistry.js` |
+| Sign-in modal + unconfigured-project checklist | `frontend/src/components/AuthModal.jsx` |
+| Header account control and its menu | `frontend/src/components/AccountMenu.jsx` |
+| Account section (filed / backed) | `frontend/src/components/AccountSection.jsx` |
+| Monochrome Google mark | `frontend/src/components/GoogleMark.jsx` |
+| Firestore security rules | `backend/firestore.rules` |
+| Cloud Storage security rules | `backend/storage.rules` |
+| Firebase CLI config (rules, emulators) | `backend/firebase.json` |
+| Environment template (committed) | `backend/.env.example` |
+| Backend folder manifest (deploy/emulator scripts) | `backend/package.json` |
+| Backend setup walkthrough | `FIREBASE_SETUP.md` |
 
 ---
 
-## 10. Do / Don't
+## 10. Accounts & the registry
+
+Every report and every backing belongs to the account that made it. That is what
+makes "my record" real rather than a filter over a local array.
+
+**Two backends, one interface.** `lib/registry.js` exposes subscribe / create /
+back / withdraw / seed and hides where the data lives. With `VITE_FIREBASE_*`
+present it is Firestore; with them blank it is `localStorage`, and the page runs as
+a **local session** — everything works, nothing is shared, and the interface says
+so in plain words instead of pretending an account exists. `AuthProvider` does the
+same for the session: a Google account, or a single local stand-in identity
+carrying `isDemo: true`.
+
+**The document.** `issues/{id}` holds `code` (the public `ISS-0007` reference),
+the content fields, `location.address`, `image` + `imagePath`, `authorId` /
+`authorName` / `authorPhoto`, `createdAt`, and the pair `likedBy: [uid]` +
+`upvotes`. Those two fields *are* the backing: one uid per account, and the rules
+refuse any write where `upvotes` disagrees with `likedBy.length`. So "one account,
+one backing" is a database invariant rather than a UI convention, and "reports I
+backed" is simply every document whose `likedBy` contains your uid — no extra
+query, no join.
+
+**Ownership.** Only the author can change or withdraw a report, and the fields
+that establish authorship (`authorId`, `authorName`, `authorPhoto`, `createdAt`,
+`code`) are frozen once filed. A backing may only add or remove the caller's own
+uid and must move the count with it. Public reference codes come from
+`counters/registry`, advanced inside the same transaction as the report, so
+`ISS-####` stays gap-free.
+
+**Photographs** go to Storage at `issues/{uid}/…`: image types only, 5MB ceiling,
+public to read because the registry is public, deleteable only by their uploader.
+If a report is withdrawn the photo is cleaned up best-effort — the document is
+what matters, a stranded file is not fatal.
+
+**Secrets.** Only `VITE_*` values belong in `backend/.env`, which is gitignored;
+`.env.example` is the committed template. Vite reads that file through `envDir`
+in `frontend/vite.config.js` — move the backend folder and that line moves with
+it. A Firebase web config is not a secret —
+Vite inlines it into the bundle and Firebase hands it to every visitor by design.
+Service-account JSON and admin keys must never appear in a `VITE_*` variable. The
+security rules in `firestore.rules` and `storage.rules` are the boundary, and
+`FIREBASE_SETUP.md` walks through creating the project and deploying them.
+
+---
+
+## 11. Do / Don't
 
 | Do | Don't |
 | -- | ----- |
@@ -410,3 +506,5 @@ looking somewhere else on the page.
 | Use greyscale imagery with a hover reveal | Tint every image |
 | Animate on scroll once, slowly | Loop any background animation |
 | Set 1px rules and 2px radii | Round to 16px and stack shadows |
+| Keep every real secret in the gitignored `.env` | Put a service key in a `VITE_*` variable |
+| Let the security rules enforce one backing per account | Trust the interface to police the count |

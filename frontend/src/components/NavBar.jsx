@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { animate, stagger, utils } from 'animejs'
 import { SECTIONS } from './constants'
+import AccountMenu from './AccountMenu'
 import { DUR, EASE, STAGGER, motionEnabled } from '../lib/motion'
 import { useScrolled, useScrollSpy } from '../hooks/useAnimation'
 import { startScroll, stopScroll } from '../hooks/useSmoothScroll'
@@ -16,7 +17,7 @@ const SECTION_IDS = SECTIONS.map((section) => section.id)
  * Motion: the header fades in on load, a single accent bar slides between
  * items as you scroll, and the mobile drawer slides + staggers open.
  */
-const Navbar = ({ user }) => {
+const Navbar = ({ onRequestSignIn, myCount = 0, backedCount = 0 }) => {
   const [showMobile, setShowMobile] = useState(false)
   const [theme, setTheme] = useState(() => {
     try {
@@ -191,12 +192,11 @@ const Navbar = ({ user }) => {
 
           {/* Right cluster */}
           <div className="flex items-center gap-3 shrink-0">
-            <span
-              className="hidden lg:inline tabular"
-              style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-faint)', letterSpacing: '0.1em' }}
-            >
-              {user || 'Guest'}
-            </span>
+            <AccountMenu
+              onRequestSignIn={onRequestSignIn}
+              myCount={myCount}
+              backedCount={backedCount}
+            />
 
             <button
               type="button"
@@ -250,12 +250,6 @@ const Navbar = ({ user }) => {
                 <span style={{ fontSize: 'var(--fs-body)', fontWeight: 500 }}>{label}</span>
               </a>
             ))}
-            <span
-              className="tabular pt-3"
-              style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-faint)', letterSpacing: '0.1em' }}
-            >
-              {user || 'Guest'}
-            </span>
           </div>
         </div>
       )}
