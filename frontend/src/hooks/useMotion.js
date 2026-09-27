@@ -48,8 +48,17 @@ export function useReveal() {
       // anime timeline would freeze at its hidden "before" state. Show the
       // section statically instead — content beats choreography.
       framesFlowing().then((flowing) => {
-        if (flowing) buildTimeline(node);
-        else revealNow(node);
+        if (!flowing) {
+          revealNow(node);
+          return;
+        }
+        try {
+          buildTimeline(node);
+        } catch (err) {
+          // A broken timeline must never take the content down with it.
+          console.error('[motion] reveal failed; showing statically', err);
+          revealNow(node);
+        }
       });
     };
 
