@@ -49,13 +49,17 @@ export function useSmoothScroll() {
 
     instance = lenis;
 
-    // Land on the right section when the page is opened at a hash.
+    // Land on the right section when the page is opened at a hash. Not inside
+    // requestAnimationFrame: a frame-starved page would defer this forever and
+    // the visitor would land at the top of the page instead of their target.
     if (window.location.hash) {
       const target = document.querySelector(window.location.hash);
       if (target) {
-        requestAnimationFrame(() => {
+        try {
           lenis.scrollTo(target, { offset: -offset, immediate: true });
-        });
+        } catch {
+          target.scrollIntoView();
+        }
       }
     }
 

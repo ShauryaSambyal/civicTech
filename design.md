@@ -391,6 +391,24 @@ looking somewhere else on the page.
 
 ---
 
+### Frame-starvation safety net
+
+Every animation exists to serve the content, never the other way around. If the
+browser is not delivering animation frames (background tab, throttled webview,
+power-saving GPU), the motion layer must not take the content down with it:
+
+- `framesFlowing()` probes rAF before animating; no frames → the section shows statically.
+- A geometric probe (`setTimeout`, which is never throttled) checks whether a
+  container is already on screen, because IntersectionObserver callbacks ride the
+  rendering steps and can silently never fire on a starved page — deep links
+  (`/#report`) would otherwise land on a section that stays at `opacity: 0`.
+- A completion watchdog forces the final state 3.5s after a reveal starts if any
+  animated element has not reached it.
+- A thrown timeline falls back to `revealNow()` — an animation bug is never
+  allowed to hide a form.
+
+---
+
 ## 8. Accessibility
 
 - Text contrast ≥ 4.5:1 in both modes (`--ink` on `--bg` ≈ 16:1 dark, 17:1 light;

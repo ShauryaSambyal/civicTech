@@ -53,7 +53,31 @@ export function useReveal() {
           return;
         }
         try {
-          buildTimeline(node);
+          const timeline = buildTimeline(node);
+          
+          const guarded = node.querySelectorAll('[data-anim], [data-anim] > *');
+          const force = () => {
+            const stuck = [...guarded].some(
+              (el) => parseFloat(getComputedStyle(el).opacity) < 0.95
+            );
+            if (!stuck) return;
+            console.warn('[motion] reveal stalled; forcing final state');
+            try {
+              timeline.revert();
+            } catch {
+              /* already reverted */
+            }
+            revealNow(node);
+          };
+          const timer = setTimeout(force, 3500);
+          try {
+            Promise.resolve(timeline.finished).then(
+              () => clearTimeout(timer),
+              () => clearTimeout(timer)
+            );
+          } catch {
+            /* no finished promise; the timer alone guards */
+          }
         } catch (err) {
           // A broken timeline must never take the content down with it.
           console.error('[motion] reveal failed; showing statically', err);
@@ -77,7 +101,24 @@ export function useReveal() {
     );
 
     observer.observe(node);
-    return () => observer.disconnect();
+
+    // Safety net: IntersectionObserver callbacks are delivered during the
+    // browser's rendering steps. On a frame-starved page (background tab,
+    // throttled webview, some GPUs) the callback can silently never fire —
+    // leaving a section that IS on screen frozen at its hidden state. Probe
+    // geometry directly on the next macrotask: if the container is already in
+    // the viewport, play without waiting for the observer.
+    const geometricProbe = setTimeout(() => {
+      const rect = node.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const onScreen = rect.top < vh * 0.92 && rect.bottom > vh * 0.08;
+      if (onScreen) play();
+    }, 400);
+
+    return () => {
+      clearTimeout(geometricProbe);
+      observer.disconnect();
+    };
   }, []);
 
   return ref;
@@ -163,7 +204,22 @@ export function useInView({ threshold = 0.25, rootMargin = '0px 0px -10% 0px' } 
     );
 
     observer.observe(node);
-    return () => observer.disconnect();
+
+    // Same geometric safety net as useReveal: on a frame-starved page the
+    // observer callback can never fire, freezing count-ups at 0. Probe on a
+    // macrotask instead, which is never throttled.
+    const probe = setTimeout(() => {
+      const rect = node.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      if (rect.top < vh * 0.75 && rect.bottom > 0) setInView(true);
+    }, 400);
+
+    return () => {
+      clearTimeout(probe);
+      observer.disconnect();
+    };
+  // Deps deliberately exclude `inView`: the observer and probe each run once
+  // and disconnect/settle, and repeat setInView(true) calls are React no-ops.
   }, [threshold, rootMargin]);
 
   return [ref, inView];
