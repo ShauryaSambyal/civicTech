@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowRight } from 'lucide-react';
 import { useCountUp } from '../hooks/useAnimation';
 import { useInView, useReveal } from '../hooks/useMotion';
 import { scrollToTarget } from '../hooks/useSmoothScroll';
@@ -29,8 +30,11 @@ function HeroStat({ label, value, note, accent = false }) {
 }
 
 /**
- * Section 01. One declarative sentence at hero scale, then supporting copy on a
- * hairline — the reference site's opening move: type does the work, no chrome.
+ * Section 01. The reference's opening move, rebuilt for a registry: one
+ * declarative sentence at display scale in the serif, the supporting copy
+ * beneath it, then a single inline action bar with the firm's one filled
+ * pill — the prompt on paper, the signal action beside it.
+ *
  * The headline is wiped up word by word; everything else rises behind it.
  */
 export default function Hero({ issues }) {
@@ -46,7 +50,7 @@ export default function Hero({ issues }) {
       aria-labelledby="overview-title"
       className="container"
       style={{
-        paddingTop: 'calc(var(--header-h) + clamp(3rem, 7vw, 6rem))',
+        paddingTop: 'calc(var(--header-h) + clamp(3rem, 6vw, 5rem))',
         paddingBottom: 'var(--space-section)'
       }}
     >
@@ -56,35 +60,42 @@ export default function Hero({ issues }) {
         <h1
           id="overview-title"
           className="mt-6 text-body display"
-          style={{ fontSize: 'var(--fs-hero)', maxWidth: '22ch' }}
+          style={{ fontSize: 'var(--fs-hero)', maxWidth: '19ch' }}
           data-anim="mask"
         >
           Every issue you raise moves the city forward.
         </h1>
 
-        <div className="rule mt-10 sm:mt-14" data-anim="scale-x" aria-hidden="true" />
+        <p className="lead mt-7 measure" data-anim="fade-up">
+          Browse what your neighbours have reported, back the problems that matter most,
+          and watch them move from reported to resolved. Nothing is filed away — every
+          report stays visible until someone closes it.
+        </p>
 
-        <div className="pt-8 flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-16">
-          <p className="lead" data-anim="fade-up">
-            Browse what your neighbours have reported, back the problems that matter most,
-            and watch them move from reported to resolved. Nothing is filed away — every
-            report stays visible until someone closes it.
-          </p>
-
-          <div className="flex flex-wrap items-center gap-3 md:pt-1 md:flex-shrink-0" data-anim="fade-up">
-            <Magnetic as="a" href="#report" className="btn btn-primary" strength={5}>
+        <div className="mt-9 flex flex-wrap items-center gap-4" data-anim="fade-up">
+          <div className="hero-action">
+            <p className="prompt">Something broken in your neighbourhood?</p>
+            <Magnetic as="a" href="#report" className="btn btn-primary shrink-0" strength={5}>
               Report an issue
-            </Magnetic>
-            <Magnetic as="button" type="button" className="btn btn-ghost" strength={5}
-              onClick={() => scrollToTarget('#issues')}
-            >
-              Browse the registry
+              <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
             </Magnetic>
           </div>
+
+          <Magnetic
+            as="button"
+            type="button"
+            className="btn btn-ghost"
+            strength={5}
+            onClick={() => scrollToTarget('#issues')}
+          >
+            Browse the registry
+          </Magnetic>
         </div>
 
+        <div className="rule mt-12 sm:mt-16" data-anim="scale-x" aria-hidden="true" />
+
         <p
-          className="tabular mt-14"
+          className="tabular mt-8"
           style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-faint)', letterSpacing: '0.14em' }}
           data-anim="fade-up"
         >

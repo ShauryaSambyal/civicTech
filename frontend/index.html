@@ -1,18 +1,25 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="CivicTech — report, track and resolve local civic issues together." />
-    <meta name="theme-color" content="#08090a" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#f7f7f5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e0c08" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fbf8ef" media="(prefers-color-scheme: light)" />
     <title>CivicTech — Report. Track. Resolve.</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!--
+      Type pairing, from the cloaked.com design language:
+        Instrument Serif  — display headlines (the reference's Simula Book)
+        Inter Tight       — interface and body text (the reference's grotesque)
+        IBM Plex Mono     — instrumentation labels, codes and figures
+        Barlow Condensed  — the incident report form, and only the form
+    -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital,wght@0,400;1,400&family=Inter+Tight:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
 
@@ -21,17 +28,19 @@
       flag motion availability. `.motion` is what arms every animation's
       "before" state in CSS, so if JS is off — or the visitor asked for reduced
       motion — the page renders fully visible and static instead.
+
+      The default is the reference's warm cream paper; dark is the opt-in.
     -->
     <script>
       (function () {
         var root = document.documentElement;
         try {
           var stored = localStorage.getItem('theme');
-          var theme = stored === 'light' || stored === 'dark' ? stored : 'dark';
+          var theme = stored === 'light' || stored === 'dark' ? stored : 'light';
           root.classList.toggle('dark', theme === 'dark');
-          root.style.backgroundColor = theme === 'dark' ? '#08090a' : '#f7f7f5';
+          root.style.backgroundColor = theme === 'dark' ? '#0e0c08' : '#fbf8ef';
         } catch (e) {
-          root.classList.add('dark');
+          root.classList.remove('dark');
         }
         try {
           var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

@@ -15,39 +15,41 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-	--font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-	--font-display: "Inter Tight", "Inter", ui-sans-serif, system-ui, sans-serif;
+	--font-sans: "Inter Tight", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	--font-display: "Instrument Serif", "Inter Tight", ui-serif, Georgia, serif;
 	--font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	--font-form: "Barlow Condensed", "Inter Tight", ui-sans-serif, system-ui, sans-serif;
 }
 
 /* ------------------------------------------------------------
    1. Tokens — light is the base, .dark overrides
    ------------------------------------------------------------ */
 :root {
-	--bg: #f7f7f5;
+	--bg: #fbf8ef;
 	--bg-2: #ffffff;
-	--ink: #0b0b0c;
-	--ink-muted: #55585c;
-	--ink-faint: #8a8d91;
+	--ink: #130f02;
+	--ink-muted: #5a5344;
+	--ink-faint: #8b8271;
 
-	--rule: rgba(11, 11, 12, 0.12);
-	--rule-strong: rgba(11, 11, 12, 0.26);
+	--rule: rgba(69, 64, 48, 0.2);
+	--rule-strong: rgba(69, 64, 48, 0.42);
 
-	--surface: rgba(11, 11, 12, 0.025);
-	--surface-hover: rgba(11, 11, 12, 0.05);
+	--surface: rgba(69, 64, 48, 0.045);
+	--surface-hover: rgba(69, 64, 48, 0.08);
 
 	/* The single signal colour */
-	--accent: #d21e45;
-	--accent-ink: #ffffff;
-	--accent-soft: rgba(210, 30, 69, 0.14);
+	--accent: #ff550c;
+	--accent-ink: #fbf8ef;
+	--accent-soft: rgba(255, 85, 12, 0.14);
 
-	--shadow-overlay: 0 24px 60px -32px rgba(11, 11, 12, 0.35);
+	--shadow-overlay: 0 30px 70px -44px rgba(19, 15, 2, 0.38);
+	--shadow-paper: 0 26px 60px -46px rgba(19, 15, 2, 0.42);
 
-	--scroll-thumb: rgba(11, 11, 12, 0.2);
+	--scroll-thumb: rgba(69, 64, 48, 0.25);
 	--scroll-track: transparent;
 
-	/* Geometry */
-	--radius: 2px;
+	/* Geometry — the reference's soft panels and fully rounded pills */
+	--radius: 10px;
 	--radius-pill: 999px;
 
 	/* Space */
@@ -59,11 +61,17 @@
 	--space-6: 1.5rem;
 	--space-8: 2rem;
 	--space-section: clamp(4.5rem, 9vw, 9rem);
-	--header-h: 4rem;
+
+	/* The fixed header: an announcement strip over the nav row.
+	   --header-h is written out rather than summed with calc(): the scroll
+	   helpers parse this value with parseFloat(), which cannot read a calc(). */
+	--header-strip-h: 2.5rem;
+	--header-row-h: 4.5rem;
+	--header-h: 7rem;
 
 	/* Type scale */
-	--fs-hero: clamp(2.5rem, 7vw, 5.25rem);
-	--fs-h2: clamp(1.75rem, 3.4vw, 2.75rem);
+	--fs-hero: clamp(2.5rem, 5.2vw, 3.75rem);
+	--fs-h2: clamp(1.75rem, 3.2vw, 2.5rem);
 	--fs-h3: 1.0625rem;
 	--fs-lead: clamp(1rem, 1.35vw, 1.1875rem);
 	--fs-body: 0.9375rem;
@@ -81,25 +89,26 @@
 }
 
 .dark {
-	--bg: #08090a;
-	--bg-2: #0d0e10;
-	--ink: #f2f2ef;
-	--ink-muted: #9a9c9f;
-	--ink-faint: #6a6d71;
+	--bg: #0e0c08;
+	--bg-2: #17140e;
+	--ink: #f7f3e8;
+	--ink-muted: #a9a293;
+	--ink-faint: #7b7466;
 
-	--rule: rgba(242, 242, 239, 0.13);
-	--rule-strong: rgba(242, 242, 239, 0.26);
+	--rule: rgba(247, 243, 232, 0.15);
+	--rule-strong: rgba(247, 243, 232, 0.32);
 
-	--surface: rgba(242, 242, 239, 0.03);
-	--surface-hover: rgba(242, 242, 239, 0.06);
+	--surface: rgba(247, 243, 232, 0.04);
+	--surface-hover: rgba(247, 243, 232, 0.085);
 
-	--accent: #e11d48;
-	--accent-ink: #ffffff;
-	--accent-soft: rgba(225, 29, 72, 0.14);
+	--accent: #ff6a26;
+	--accent-ink: #14110b;
+	--accent-soft: rgba(255, 106, 38, 0.16);
 
 	--shadow-overlay: 0 32px 80px -40px rgba(0, 0, 0, 0.9);
+	--shadow-paper: 0 30px 70px -44px rgba(0, 0, 0, 0.85);
 
-	--scroll-thumb: rgba(242, 242, 239, 0.18);
+	--scroll-thumb: rgba(247, 243, 232, 0.2);
 
 	color-scheme: dark;
 }
@@ -145,9 +154,9 @@ h2,
 h3,
 h4 {
 	font-family: var(--font-display);
-	font-weight: 500;
-	letter-spacing: -0.03em;
-	line-height: 1.05;
+	font-weight: 400;
+	letter-spacing: -0.015em;
+	line-height: 1.1;
 	color: var(--ink);
 }
 
@@ -232,9 +241,9 @@ section[id],
 
 .display {
 	font-family: var(--font-display);
-	letter-spacing: -0.03em;
-	line-height: 1.02;
-	font-weight: 500;
+	letter-spacing: -0.02em;
+	line-height: 1.06;
+	font-weight: 400;
 }
 
 .eyebrow {
@@ -301,6 +310,15 @@ section[id],
 	border-radius: var(--radius);
 }
 
+/* Raised paper — a solid panel that has to be found instantly, used by the
+   incident report form. The only surface in the system that lifts off the page. */
+.surface-paper {
+	background-color: var(--bg-2);
+	border: 1px solid var(--rule-strong);
+	border-radius: calc(var(--radius) + 6px);
+	box-shadow: var(--shadow-paper);
+}
+
 /* Signature image treatment: monochrome at rest, colour on hover. */
 .media-grey img,
 img.media-grey {
@@ -320,11 +338,11 @@ img.media-grey:hover {
    ------------------------------------------------------------ */
 .field {
 	width: 100%;
-	background-color: transparent;
+	background-color: var(--bg-2);
 	border: 1px solid var(--rule);
 	border-radius: var(--radius);
 	color: var(--ink);
-	padding: 0.7rem 0.8rem;
+	padding: 0.8rem 0.95rem;
 	font-size: var(--fs-body);
 	font-family: var(--font-sans);
 	outline: none;
@@ -436,14 +454,14 @@ textarea.field {
 	align-items: center;
 	justify-content: center;
 	gap: 0.5rem;
-	border-radius: var(--radius);
+	border-radius: var(--radius-pill);
 	border: 1px solid transparent;
-	padding: 0.7rem 1.05rem;
-	font-family: var(--font-mono);
-	font-size: var(--fs-micro);
+	padding: 0.72rem 1.35rem;
+	font-family: var(--font-sans);
+	font-size: 0.875rem;
 	font-weight: 500;
-	letter-spacing: 0.14em;
-	text-transform: uppercase;
+	letter-spacing: -0.005em;
+	text-transform: none;
 	white-space: nowrap;
 	cursor: pointer;
 	transition: background-color var(--dur-micro) var(--ease-out),
@@ -461,20 +479,22 @@ textarea.field {
 	cursor: not-allowed;
 }
 
-/* Primary = the inverted block. No gradient, no glow. */
+/* Primary = the one filled pill. This is the only place the accent fills a
+   large area, so the signal action is unmistakable. */
 .btn-primary {
-	background-color: var(--ink);
-	color: var(--bg);
-	border-color: var(--ink);
+	background-color: var(--accent);
+	color: var(--accent-ink);
+	border-color: var(--accent);
 }
 
 .btn-primary:hover:not(:disabled) {
-	opacity: 0.88;
+	background-color: color-mix(in srgb, var(--accent) 86%, var(--ink));
+	border-color: color-mix(in srgb, var(--accent) 86%, var(--ink));
 }
 
 .btn-ghost {
 	background-color: transparent;
-	border-color: var(--rule);
+	border-color: var(--rule-strong);
 	color: var(--ink);
 }
 
@@ -498,10 +518,10 @@ textarea.field {
 .btn-icon {
 	display: grid;
 	place-items: center;
-	height: 2.25rem;
-	width: 2.25rem;
-	border: 1px solid var(--rule);
-	border-radius: var(--radius);
+	height: 2.4rem;
+	width: 2.4rem;
+	border: 1px solid var(--rule-strong);
+	border-radius: var(--radius-pill);
 	background-color: transparent;
 	color: var(--ink);
 	cursor: pointer;
@@ -830,6 +850,170 @@ textarea.field {
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
+}
+
+/* ------------------------------------------------------------
+   13b. Incident report form — Barlow Condensed
+
+   One condensed family, one weight per role, so the form reads as a single
+   instrument rather than a pile of controls:
+
+     600  section heading, field labels, the submit action
+     500  choice tiles, counters and footnotes
+     400  what the reader types, and the supporting prose around it
+   ------------------------------------------------------------ */
+.form-condensed {
+	font-family: var(--font-form);
+}
+
+.form-condensed h2 {
+	font-family: var(--font-form);
+	font-weight: 600;
+	letter-spacing: 0.005em;
+	line-height: 1.05;
+}
+
+.form-condensed .lead {
+	font-family: var(--font-form);
+	font-size: 1.125rem;
+	font-weight: 400;
+	line-height: 1.5;
+}
+
+.form-condensed .label,
+.form-condensed legend.label {
+	font-family: var(--font-form);
+	font-size: 0.875rem;
+	font-weight: 600;
+	letter-spacing: 0.13em;
+	color: var(--ink-muted);
+}
+
+.form-condensed .field {
+	font-family: var(--font-form);
+	font-size: 1.0625rem;
+	font-weight: 400;
+	letter-spacing: 0.015em;
+	/* The panel is paper, so the fields need their own tone and a firm
+	   hairline to read as inputs rather than empty space. */
+	background-color: color-mix(in srgb, var(--ink) 4%, var(--bg-2));
+	border-color: color-mix(in srgb, var(--ink) 22%, transparent);
+}
+
+.form-condensed .field::placeholder {
+	color: var(--ink-faint);
+	font-weight: 400;
+	letter-spacing: 0.015em;
+}
+
+.form-condensed textarea.field {
+	font-size: 1.0625rem;
+	line-height: 1.55;
+}
+
+.form-condensed .choice {
+	font-family: var(--font-form);
+	background-color: color-mix(in srgb, var(--ink) 3%, var(--bg-2));
+	border-color: color-mix(in srgb, var(--ink) 18%, transparent);
+}
+
+/* The chosen category is stated plainly: accent hairline and a tinted fill. */
+.form-condensed .choice[aria-pressed="true"] {
+	background-color: var(--accent-soft);
+	border-color: var(--accent);
+	color: var(--ink);
+}
+
+/* The category code stays monospaced: it is a code, not prose. */
+.form-condensed .choice .c-code {
+	font-family: var(--font-mono);
+	font-size: 0.6875rem;
+	font-weight: 500;
+	letter-spacing: 0.14em;
+}
+
+.form-condensed .choice .c-name {
+	font-family: var(--font-form);
+	font-size: 1.0625rem;
+	font-weight: 500;
+	letter-spacing: 0.015em;
+}
+
+.form-condensed .btn {
+	font-family: var(--font-form);
+	font-size: 0.9375rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.form-condensed .metric,
+.form-condensed .note {
+	font-family: var(--font-form);
+	font-size: 0.9375rem;
+	font-weight: 500;
+	letter-spacing: 0.03em;
+}
+
+/* ------------------------------------------------------------
+   13c. Header strip and the hero action bar
+   ------------------------------------------------------------ */
+/* The fixed header's announcement strip: live registry figures, always on. */
+.header-strip {
+	height: var(--header-strip-h);
+	background-color: var(--bg);
+	border-bottom: 1px solid var(--rule);
+}
+
+.strip-link {
+	color: var(--accent);
+	font-weight: 500;
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 2px;
+}
+
+/* The hero's action row — the reference's inline capture bar, rebuilt as one
+   honest control: a prompt on paper with the signal action beside it. */
+.hero-action {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-3) var(--space-4);
+	width: 100%;
+	max-width: 36rem;
+	padding: 0.6rem 0.6rem 0.6rem 1.15rem;
+	background-color: var(--bg-2);
+	border: 1px solid var(--rule-strong);
+	border-radius: var(--radius-pill);
+	box-shadow: var(--shadow-paper);
+}
+
+.hero-action .prompt {
+	font-size: var(--fs-small);
+	color: var(--ink-muted);
+}
+
+@media (max-width: 560px) {
+	.hero-action {
+		border-radius: calc(var(--radius) + 6px);
+		justify-content: center;
+		text-align: center;
+	}
+}
+
+/* `.btn-icon` sets `display: grid`, and these rules come after Tailwind's
+   utilities — so a `md:hidden` class would lose the cascade. This is the
+   explicit rule for controls that only exist on small screens. */
+.btn-icon.md-hidden {
+	display: grid;
+}
+
+@media (min-width: 768px) {
+	.btn-icon.md-hidden {
+		display: none;
+	}
 }
 
 /* ------------------------------------------------------------

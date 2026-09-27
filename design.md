@@ -1,9 +1,12 @@
 # CivicTech — Design System
 
-The visual contract for the CivicTech frontend. It is a **direct adaptation of the
-design language used by [boonglobal.io](https://www.boonglobal.io/)**, applied to a
-civic-issue reporting product. Everything visual in `frontend/` resolves from the
-tokens and rules in this document.
+The visual contract for the CivicTech frontend. It is a **direct adaptation of two
+reference sites**, applied to a civic-issue reporting product: the structural and
+motion language of [boonglobal.io](https://www.boonglobal.io/), and the surface
+language — palette, type pairing, pill geometry, fixed two-row header — of
+[cloaked.com](https://www.cloaked.com/). Where the two disagree on look, cloaked.com
+wins; where they disagree on motion and structure, boonglobal.io does. Everything
+visual in `frontend/` resolves from the tokens and rules in this document.
 
 ---
 
@@ -13,6 +16,11 @@ What was taken from the reference site and what was interpreted:
 
 | Item | Source | Confidence |
 | ---- | ------ | ---------- |
+| Palette — cream ground `#FBF8EF`, warm ink `#130F02`, hot orange `#FF550C` | `getComputedStyle` read off the live `cloaked.com` DOM | **Observed** |
+| Pill geometry — `border-radius: 1000px` controls, 8px panels | Same extraction | **Observed** |
+| Fixed two-row header — 39px announcement strip + 73px nav row = 112px, solid ground, `z-index: 10` | Same extraction | **Observed** |
+| Type pairing — a serif at display scale (Simula Book, 400, −0.02em) over a grotesque body (Stkbureausans, 300–400) | Same extraction | **Observed** |
+| Font binaries | Substituted with free equivalents — Instrument Serif for Simula Book, Barlow Condensed for the form | **Substituted** |
 | Section structure, copy hierarchy, tone, naming | Live content extracted from `boonglobal.io` | **Observed** |
 | One-page nav model, numbered/monospace eyebrow labels, hairline rules | Observed in the reference site's element breakdown | **Observed** |
 | Build stack — `Nuxt.js`, `Anime.js`, `Sanity` | Awwwards nominee listing for Boon Global (Milkshake Studio, Sep 2026) | **Observed** |
@@ -92,45 +100,49 @@ Rules:
 
 ## 3. Colour
 
-Monochrome surface ramp + exactly one accent. Two modes, class-toggled on `<html>`
-(`.dark`), default dark.
+Warm paper ramp + exactly one hot accent. Two modes, class-toggled on `<html>`
+(`.dark`). **Light is the default** — it is the reference's own setting, so the
+first thing a visitor sees is the cream page the design was drawn on.
 
-### Dark (default — the reference's native setting)
+### Light (default — cream paper, values read off cloaked.com)
 
 | Token | Value | Use |
 | ----- | ----- | --- |
-| `--bg` | `#08090A` | Page ground |
-| `--bg-2` | `#0D0E10` | Raised ground, modal panel |
-| `--ink` | `#F2F2EF` | Primary text (warm off-white, never `#FFF`) |
-| `--ink-muted` | `#9A9C9F` | Body copy, descriptions |
-| `--ink-faint` | `#6A6D71` | Metadata, labels, placeholders |
-| `--rule` | `rgba(242,242,239,0.13)` | Hairlines, panel edges, inputs |
-| `--rule-strong` | `rgba(242,242,239,0.26)` | Hover edges, active rails |
-| `--surface` | `rgba(242,242,239,0.03)` | Flat panel fill |
-| `--surface-hover` | `rgba(242,242,239,0.06)` | Hover fill, selected rows |
-| `--accent` | `#E11D48` | Single signal colour |
-| `--accent-ink` | `#FFFFFF` | Text on accent fills |
-| `--accent-soft` | `rgba(225,29,72,0.14)` | Accent tints, focus rings |
+| `--bg` | `#FBF8EF` | Page ground (the reference's exact cream) |
+| `--bg-2` | `#FFFFFF` | Raised ground: panels, modal, fields |
+| `--ink` | `#130F02` | Primary text (warm near-black, never `#000`) |
+| `--ink-muted` | `#5A5344` | Body copy, descriptions |
+| `--ink-faint` | `#8B8271` | Metadata, labels, placeholders |
+| `--rule` | `rgba(69,64,48,0.20)` | Hairlines, panel edges, inputs |
+| `--rule-strong` | `rgba(69,64,48,0.42)` | Hover edges, active rails, pills |
+| `--surface` | `rgba(69,64,48,0.045)` | Flat panel fill |
+| `--surface-hover` | `rgba(69,64,48,0.08)` | Hover fill, selected rows |
+| `--accent` | `#FF550C` | Single signal colour (the reference's orange) |
+| `--accent-ink` | `#FBF8EF` | Text on accent fills |
+| `--accent-soft` | `rgba(255,85,12,0.14)` | Accent tints, focus rings, selected tiles |
 
-### Light
+### Dark (the same page at night, warm rather than blue)
 
 | Token | Value |
 | ----- | ----- |
-| `--bg` | `#F7F7F5` |
-| `--bg-2` | `#FFFFFF` |
-| `--ink` | `#0B0B0C` |
-| `--ink-muted` | `#55585C` |
-| `--ink-faint` | `#8A8D91` |
-| `--rule` | `rgba(11,11,12,0.12)` |
-| `--rule-strong` | `rgba(11,11,12,0.26)` |
-| `--surface` | `rgba(11,11,12,0.025)` |
-| `--surface-hover` | `rgba(11,11,12,0.05)` |
-| `--accent` | `#D21E45` |
+| `--bg` | `#0E0C08` |
+| `--bg-2` | `#17140E` |
+| `--ink` | `#F7F3E8` |
+| `--ink-muted` | `#A9A293` |
+| `--ink-faint` | `#7B7466` |
+| `--rule` | `rgba(247,243,232,0.15)` |
+| `--rule-strong` | `rgba(247,243,232,0.32)` |
+| `--surface` | `rgba(247,243,232,0.04)` |
+| `--surface-hover` | `rgba(247,243,232,0.085)` |
+| `--accent` | `#FF6A26` |
 
-**Accent discipline.** `--accent` may appear only as: the active nav underline, a
-status dot, a required-field asterisk, a primary figure, the focus ring, and 3px
-toast edge bars. It never fills a card, never forms a gradient, never sets a
-heading. If a screen has more than a handful of accent pixels, it is wrong.
+**Accent discipline.** `--accent` may appear only as: the filled primary pill
+(exactly one per view), the announcement-strip link, the sliding nav underline, a
+status dot, a required-field asterisk, a selected category tile, a primary figure,
+the focus ring, and 3px toast edge bars. It never fills a card, never forms a
+gradient, never sets a heading, and is never used as a large background. The one
+filled pill is the page's single loudest mark — if a screen has two compete for
+that attention, it is wrong.
 
 **Legacy brand ramp retired.** The old `--crimson / --orange / --blue / --sky…`
 gradient ramp, gradient hairline (`.surface-lit`), sheen (`.btn-sheen`), glow
@@ -143,18 +155,36 @@ identity now comes from `--accent` plus monospace label text, not from hue.
 
 | Role | Family | Weights | Notes |
 | ---- | ------ | ------- | ----- |
-| Display | `Inter Tight` (Google Fonts) | 400 / 500 / 600 | Heroes, section and card titles. Tight tracking. |
-| Body | `Inter` | 400 / 500 | Prose, form values, descriptions |
-| Mono | `IBM Plex Mono` | 400 / 500 | Eyebrows, section numbers, metadata, figures, chips |
+| Display | `Instrument Serif` (Google Fonts) | 400 (+ italic) | Heroes and section titles **only**. The reference sets its headlines in a serif (Simula Book) over a sans body; this is the free equivalent. |
+| Body | `Inter Tight` | 300 / 400 / 500 / 600 | Prose, interface text, form values, buttons |
+| Mono | `IBM Plex Mono` | 400 / 500 | Eyebrows, section numbers, metadata, figures, chips, category codes |
+| Form | `Barlow Condensed` | 400 / 500 / 600 | The incident report form, and only that section (see below) |
 
-Tokens: `--font-display`, `--font-sans`, `--font-mono`.
+Tokens: `--font-display`, `--font-sans`, `--font-mono`, `--font-form`.
+
+### The incident report form — one family, one weight per role
+
+Section 03 is wrapped in `.form-condensed` and switches entirely to Barlow
+Condensed. The weights are not decorative; each one marks a job:
+
+| Weight | Role |
+| ------ | ---- |
+| **600** | The section heading, every field label, and the submit action |
+| **500** | Category tiles, counters, footnotes |
+| **400** | What the reader types — inputs, textarea, placeholder |
+
+Two things deliberately stay monospaced, because they are data rather than prose:
+the category codes (`RDS`, `SAN`, `LGT`…) and the `n/4` completion counter. Because
+the panel is white paper, the fields inside it carry their own warm tone
+(`color-mix(in srgb, var(--ink) 4%, var(--bg-2))`) and a firmer hairline, so an
+input never reads as empty space.
 
 ### Scale (fluid, rem)
 
 | Token | Size | Applied to |
 | ----- | ---- | ---------- |
-| `--fs-hero` | `clamp(2.5rem, 7vw, 5.25rem)` | Hero `<h1>` |
-| `--fs-h2` | `clamp(1.75rem, 3.4vw, 2.75rem)` | Section headings |
+| `--fs-hero` | `clamp(2.5rem, 5.2vw, 3.75rem)` | Hero `<h1>` — 60px at 1440 (the reference sets 56px) |
+| `--fs-h2` | `clamp(1.75rem, 3.2vw, 2.5rem)` | Section headings |
 | `--fs-h3` | `1.0625rem` | Card titles |
 | `--fs-lead` | `clamp(1rem, 1.35vw, 1.1875rem)` | Section intros, hero subcopy |
 | `--fs-body` | `0.9375rem` | Default text |
@@ -163,7 +193,9 @@ Tokens: `--font-display`, `--font-sans`, `--font-mono`.
 
 Rules:
 
-- Display/heading tracking `-0.03em`; display `line-height: 0.98–1.05`.
+- Display/heading tracking `-0.015em` (`-0.02em` on the hero); display
+  `line-height: 1.06–1.1`. The display serif is always weight **400** — it ships
+  one weight, and synthetic bolding makes it look broken.
 - Body text `line-height: 1.65`, measure capped at **68ch**.
 - `.eyebrow` = mono, `--fs-micro`, uppercase, `letter-spacing: 0.18em`,
   `--ink-faint`. Prefix with a section number: `01 — Overview`.
@@ -185,11 +217,12 @@ Rules:
 - **Grid**: 12-column mental model; content grids use `gap: 1px` on a `--rule`
   background to draw hairline separations between cells where a table-like read is
   wanted, otherwise plain gaps of `--space-4`.
-- **Radius**: `--radius: 2px` for panels, inputs and buttons. `--radius-pill: 999px`
-  is reserved for chips and avatars only.
-- **Elevation**: none. Depth is expressed with `--bg-2` and hairlines. A single
-  near-invisible shadow (`--shadow-overlay`) is permitted on the modal and toasts,
-  where an element genuinely floats above the page.
+- **Radius**: `--radius: 10px` for panels and inputs; `--radius-pill: 999px` for
+  **every button**, chip and avatar — the reference's controls are fully rounded.
+  The report panel and the hero action bar sit at `calc(var(--radius) + 6px)`.
+- **Elevation**: hairline-first. `--shadow-overlay` is permitted on the modal and
+  toasts, and `--shadow-paper` on the two surfaces that must be found instantly:
+  the incident report panel and the hero action bar. Nothing else lifts.
 - **Rules**: `.rule` = 1px `--rule` full-width divider. `.rule-accent` = 1px rule
   with a short accent segment at its left end, used once per section at most.
 
@@ -197,25 +230,42 @@ Rules:
 
 ## 6. Component rules
 
-### Header / nav
-- Full-width, `position: sticky; top: 0`, transparent over the hero.
-- Once scrolled (`scrollY > 8`), gains `--bg` at 86% opacity, `backdrop-filter: blur(18px)`
-  and a bottom hairline. Height `4rem`; no logo glow, no pulsing ring.
-- Brand = wordmark only (`Civic` in `--ink`, `Tech` in `--ink-muted`), display face,
-  `-0.03em`. No gradient text, no animated logo tile.
-- Nav items are **anchor links** to `#overview · #issues · #report · #analytics`.
-  At rest they are `--ink-faint`; the active one is `--ink` with a 1px
-  `--accent` underline sitting flush on the header's bottom hairline.
-- Right cluster: user name (mono, `--ink-faint`) and a square theme toggle
-  (`--rule` border, radius `--radius`), plus a mobile menu button.
-- Mobile: a drawer under the bar, items in a single column, hairline-separated.
+### Header / nav — fixed, two rows
+- `position: fixed; inset-inline: 0; top: 0`, `z-index: 50`, **solid `--bg`** — it
+  never goes transparent over the hero, exactly as the reference's does. Total
+  height `--header-h: 7rem` = `--header-strip-h: 2.5rem` + `--header-row-h: 4.5rem`
+  (112px; the reference measures 113px). The token is written out rather than
+  summed with `calc()`, because the scroll helpers parse it with `parseFloat`.
+- **Row 1 — the announcement strip.** Live registry figures on the left (`n reports
+  on record · n awaiting action [· n resolved]`), a `File a report` link in
+  `--accent`, underlined, on the right, over a bottom hairline. Clauses drop on
+  narrow screens; the words are never duplicated between breakpoints, because a
+  screen reader would read both copies.
+- **Row 2 — the nav itself.** Wordmark left, section rail centre, account cluster right.
+- Scrolled (`scrollY > 8`): a bottom hairline appears, plus a soft shadow. Nothing
+  moves or resizes — the header is stable chrome, not a shrinking bar.
+- Brand = wordmark only (`Civic` in `--ink`, `Tech` in `--ink-muted`) in the display
+  serif at 1.5rem. No gradient text, no animated logo tile.
+- Nav items are **anchor links** to `#overview · #issues · #report · #analytics ·
+  #account`. At rest they are `--ink-faint`; the active one is `--ink`, with a 2px
+  `--accent` underline that **slides** between items rather than fading per item.
+  The scroll spy's offset is the header's own height, never a magic number.
+- Right cluster: the sign-in pill / account chip, a round theme toggle, and a menu
+  button that exists **only below `md`**.
+- Mobile: a drawer under the bar, items in a single column, hairline-separated,
+  with the page scroll frozen while it is open.
+
+**One cascade trap, documented because it bit us.** Tailwind's utilities are
+imported before this file, so a `md:hidden` class **loses** to `.btn-icon { display:
+grid }` and the mobile menu button stays visible on desktop. Controls that are
+breakpoint-gated own their rule: `.btn-icon.md-hidden`.
 
 ### Buttons
 | Class | Look |
 | ----- | ---- |
-| `.btn` | mono-ish uppercase micro label, `--radius`, hairline border, `gap: 0.5rem` |
-| `.btn-primary` | `background: var(--ink)`, `color: var(--bg)`, no border. On dark this is the site's white button. |
-| `.btn-ghost` | transparent, `1px solid var(--rule)`, `--ink`; hover → `--rule-strong` + `--surface-hover` |
+| `.btn` | body-family label at 0.875rem — no uppercase, no mono — `--radius-pill`, `padding: 0.72rem 1.35rem` |
+| `.btn-primary` | **`background: var(--accent)`**, `color: var(--accent-ink)`, no border. The page's one filled pill. |
+| `.btn-ghost` | transparent, `1px solid var(--rule-strong)`, `--ink`; hover → `--surface-hover` |
 | `.btn-quiet` | text-only, `--ink-muted`, hover → `--ink` |
 
 No gradients, no sheen sweeps, no translateY lifts. Press = `opacity: .85`;
@@ -393,19 +443,32 @@ looking somewhere else on the page.
 
 ### Frame-starvation safety net
 
-Every animation exists to serve the content, never the other way around. If the
-browser is not delivering animation frames (background tab, throttled webview,
-power-saving GPU), the motion layer must not take the content down with it:
+Every animation exists to serve the content, never the other way around. This was
+measured, not assumed: in a throttled page the browser delivers **no animation
+frames, no IntersectionObserver callbacks and no scroll events** — all three ride
+the rendering steps — while `setTimeout` and `setInterval` keep running (coarsely,
+about once a second). Timers are therefore the only signal that survives, and the
+motion layer is built to need nothing else:
 
-- `framesFlowing()` probes rAF before animating; no frames → the section shows statically.
-- A geometric probe (`setTimeout`, which is never throttled) checks whether a
-  container is already on screen, because IntersectionObserver callbacks ride the
-  rendering steps and can silently never fire on a starved page — deep links
-  (`/#report`) would otherwise land on a section that stays at `opacity: 0`.
-- A completion watchdog forces the final state 3.5s after a reveal starts if any
-  animated element has not reached it.
-- A thrown timeline falls back to `revealNow()` — an animation bug is never
+- **`framesFlowing()` tests a rate, not a frame.** Three frames must land inside
+  250ms (≈12fps). One frame arriving is *not* enough: a tab crawling at 1fps would
+  pass a single-frame test and then play the timeline over minutes, which reads as
+  a broken page. Below the rate, the section is shown statically instead.
+- **Geometry, tested directly.** `useReveal()` checks `getBoundingClientRect`
+  against the viewport on mount, on two delayed probes, on `scroll` and `resize`,
+  and on a 600ms poll. Any one of those firing is enough to reveal the section. The
+  poll stops the instant the section has played.
+- **A completion watchdog** forces the final state 2s after a reveal starts if any
+  animated element still has not reached it.
+- **A thrown timeline** falls back to `revealNow()` — an animation bug is never
   allowed to hide a form.
+- **The fixed chrome is guarded too.** The header's entrance, the mobile drawer, and
+  the theme toggle each commit their end state on a timer as well. A frozen header
+  timeline would otherwise leave a fixed bar sitting 14px off-screen with its links
+  faded out, and a frozen theme timeline would leave the control doing nothing.
+
+Measured result in a fully throttled tab: the report section — the one that matters
+most — reveals from an anchor jump in **~400ms** rather than never.
 
 ---
 
@@ -526,3 +589,8 @@ security rules in `firestore.rules` and `storage.rules` are the boundary, and
 | Set 1px rules and 2px radii | Round to 16px and stack shadows |
 | Keep every real secret in the gitignored `.env` | Put a service key in a `VITE_*` variable |
 | Let the security rules enforce one backing per account | Trust the interface to police the count |
+| Let the serif speak only in headlines | Set body copy, labels or buttons in the display serif |
+| Wear the cream page by default | Flip the default to dark and call it the reference |
+| Spend the accent on one filled pill per view | Fill two buttons and let them compete |
+| Keep the incident form in Barlow Condensed, 400/500/600 | Mix a fourth family into it |
+| Treat a stalled animation as a bug in the layout | Assume frames are always being delivered |

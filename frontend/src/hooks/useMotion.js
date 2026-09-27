@@ -44,9 +44,9 @@ export function useReveal() {
     const play = () => {
       if (played) return;
       played = true;
-      // If frames are not flowing (background tab, throttled webview), an
-      // anime timeline would freeze at its hidden "before" state. Show the
-      // section statically instead — content beats choreography.
+      // If frames are not flowing at a usable rate (background tab, throttled
+      // webview), an anime timeline would freeze at its hidden "before" state.
+      // Show the section statically instead — content beats choreography.
       framesFlowing().then((flowing) => {
         if (!flowing) {
           revealNow(node);
@@ -69,7 +69,9 @@ export function useReveal() {
             }
             revealNow(node);
           };
-          const timer = setTimeout(force, 3500);
+          // 2s is comfortably past the longest reveal (~1.5s including
+          // staggers), so a healthy tab always finishes on its own.
+          const timer = setTimeout(force, 2000);
           try {
             Promise.resolve(timeline.finished).then(
               () => clearTimeout(timer),
@@ -102,21 +104,46 @@ export function useReveal() {
 
     observer.observe(node);
 
-    // Safety net: IntersectionObserver callbacks are delivered during the
-    // browser's rendering steps. On a frame-starved page (background tab,
-    // throttled webview, some GPUs) the callback can silently never fire —
-    // leaving a section that IS on screen frozen at its hidden state. Probe
-    // geometry directly on the next macrotask: if the container is already in
-    // the viewport, play without waiting for the observer.
-    const geometricProbe = setTimeout(() => {
+    // Safety net. IntersectionObserver callbacks are delivered during the
+    // browser's rendering steps, so on a frame-starved page (background tab,
+    // throttled webview) the callback can silently never fire — leaving a
+    // section that IS on screen frozen at its hidden state. Geometry is tested
+    // directly instead: on mount, on a couple of delayed probes, and on every
+    // scroll and resize. Scroll and resize events do not depend on frames, so
+    // an anchor jump lands on a section that actually reveals itself.
+    const onScreen = () => {
       const rect = node.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
-      const onScreen = rect.top < vh * 0.92 && rect.bottom > vh * 0.08;
-      if (onScreen) play();
-    }, 400);
+      return rect.top < vh * 0.92 && rect.bottom > vh * 0.08;
+    };
+
+    const check = () => {
+      if (played) return true;
+      if (onScreen()) {
+        play();
+        return true;
+      }
+      return false;
+    };
+
+    const probes = [400, 1200].map((delay) => setTimeout(check, delay));
+    window.addEventListener('scroll', check, { passive: true });
+    window.addEventListener('resize', check);
+
+    // The last resort, and the only signal left in a fully throttled tab: a
+    // page that delivers no frames also delivers no observer callbacks and no
+    // scroll events, because all three ride the rendering steps. Timers are
+    // never throttled away entirely, so a slow geometry poll guarantees the
+    // content appears even then. It stops the moment the section has played.
+    const poll = setInterval(() => {
+      if (check()) clearInterval(poll);
+    }, 600);
 
     return () => {
-      clearTimeout(geometricProbe);
+      clearInterval(poll);
+      probes.forEach(clearTimeout);
+      window.removeEventListener('scroll', check);
+      window.removeEventListener('resize', check);
       observer.disconnect();
     };
   }, []);
@@ -206,16 +233,30 @@ export function useInView({ threshold = 0.25, rootMargin = '0px 0px -10% 0px' } 
     observer.observe(node);
 
     // Same geometric safety net as useReveal: on a frame-starved page the
-    // observer callback can never fire, freezing count-ups at 0. Probe on a
-    // macrotask instead, which is never throttled.
-    const probe = setTimeout(() => {
+    // observer callback can never fire, freezing count-ups at 0. Timers,
+    // scroll and resize all keep working when frames do not.
+    const check = () => {
       const rect = node.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
-      if (rect.top < vh * 0.75 && rect.bottom > 0) setInView(true);
-    }, 400);
+      if (rect.top < vh * 0.75 && rect.bottom > 0) {
+        setInView(true);
+        return true;
+      }
+      return false;
+    };
+
+    const probes = [400, 1200].map((delay) => setTimeout(check, delay));
+    window.addEventListener('scroll', check, { passive: true });
+    window.addEventListener('resize', check);
+    const poll = setInterval(() => {
+      if (check()) clearInterval(poll);
+    }, 600);
 
     return () => {
-      clearTimeout(probe);
+      clearInterval(poll);
+      probes.forEach(clearTimeout);
+      window.removeEventListener('scroll', check);
+      window.removeEventListener('resize', check);
       observer.disconnect();
     };
   // Deps deliberately exclude `inView`: the observer and probe each run once

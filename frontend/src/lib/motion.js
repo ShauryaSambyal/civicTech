@@ -66,28 +66,42 @@ export function headlineTargets(el) {
 }
 
 /**
- * True when the page is actually receiving animation frames.
+ * True when the page is receiving animation frames at a usable rate.
  *
  * A background tab, an occluded webview or a power-saving browser pauses
  * requestAnimationFrame. Building an anime timeline in that state leaves every
  * reveal frozen at its hidden "before" state until frames resume — which can be
- * forever. The reveal engine probes this before animating and falls back to
- * showing the section statically when the page is being starved.
+ * forever.
+ *
+ * The test is a rate, not a single frame: a tab crawling at one frame per
+ * second satisfies `requestAnimationFrame` once, but a timeline played at that
+ * rate would take minutes to finish, so the section would read as broken. Three
+ * frames inside the deadline is roughly 12fps — below that, the reveal engine
+ * shows the section statically instead. Content beats choreography.
  */
-export function framesFlowing(deadlineMs = 120) {
+export function framesFlowing(deadlineMs = 250, minFrames = 3) {
   return new Promise((resolve) => {
     if (typeof window === 'undefined' || typeof window.requestAnimationFrame !== 'function') {
       resolve(false);
       return;
     }
     let settled = false;
+    let frames = 0;
     const finish = (flowing) => {
       if (settled) return;
       settled = true;
       resolve(flowing);
     };
-    window.requestAnimationFrame(() => finish(true));
-    setTimeout(() => finish(false), deadlineMs);
+    const tick = () => {
+      frames += 1;
+      if (frames >= minFrames) {
+        finish(true);
+        return;
+      }
+      window.requestAnimationFrame(tick);
+    };
+    window.requestAnimationFrame(tick);
+    setTimeout(() => finish(frames >= minFrames), deadlineMs);
   });
 }
 

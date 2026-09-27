@@ -81,6 +81,9 @@ function CivicTech() {
         onRequestSignIn={() => requestSignIn()}
         myCount={registry.mine.length}
         backedCount={registry.backed.length}
+        totalReports={registry.issues.length}
+        awaiting={registry.issues.filter((issue) => issue.status === 'reported').length}
+        resolved={registry.issues.filter((issue) => issue.status === 'resolved').length}
       />
 
       <main className="flex-1">

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { headerOffset } from './useSmoothScroll';
 
 /** True when the user has asked their OS to reduce motion. */
 export const prefersReducedMotion = () =>
@@ -77,11 +78,15 @@ export function useMountFlag(delay = 80) {
  * Deliberately driven by scroll position rather than clicks, so manual
  * scrolling and deep links stay in sync with the highlighted item.
  */
-export function useScrollSpy(ids, { offset = 96 } = {}) {
+export function useScrollSpy(ids) {
   const [activeId, setActiveId] = useState(ids[0]);
 
   useEffect(() => {
     const resolve = () => {
+      // A section counts as current once it has cleared the fixed header, so
+      // the offset is the header's own height — never a magic number that
+      // drifts the moment the header changes.
+      const offset = headerOffset();
       let current = ids[0];
       for (const id of ids) {
         const node = document.getElementById(id);
@@ -98,7 +103,7 @@ export function useScrollSpy(ids, { offset = 96 } = {}) {
       window.removeEventListener('scroll', resolve);
       window.removeEventListener('resize', resolve);
     };
-  }, [ids, offset]);
+  }, [ids]);
 
   return activeId;
 }

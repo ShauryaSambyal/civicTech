@@ -137,7 +137,12 @@ export default function ReportSection({ index, label, onSubmit, user, loading, o
   const completion = (filled / 4) * 100;
 
   return (
-    <section id="report" aria-labelledby="report-title" className="container" style={{ paddingBlock: 'var(--space-section)' }}>
+    <section
+      id="report"
+      aria-labelledby="report-title"
+      className="container form-condensed"
+      style={{ paddingBlock: 'var(--space-section)' }}
+    >
       <div ref={ref}>
         <div className="rule-accent" data-anim="scale-x" aria-hidden="true" />
 
@@ -155,7 +160,7 @@ export default function ReportSection({ index, label, onSubmit, user, loading, o
         </div>
 
         <div className="mt-10 sm:mt-14">
-          <div className="surface p-6 sm:p-10" data-anim="fade-up">
+          <div className="surface-paper p-6 sm:p-10" data-anim="fade-up">
             {/* Completion meter */}
             <div className="flex items-center gap-4">
               <span className="track flex-1">
@@ -210,10 +215,10 @@ export default function ReportSection({ index, label, onSubmit, user, loading, o
                         aria-label={`${category.name} (${category.code})`}
                         className="choice"
                       >
-                        <span className="tabular shrink-0" aria-hidden="true" style={{ fontSize: 'var(--fs-micro)', color: isSelected ? 'var(--accent)' : 'var(--ink-faint)', letterSpacing: '0.14em' }}>
+                        <span className="c-code shrink-0" aria-hidden="true" style={{ color: isSelected ? 'var(--accent)' : 'var(--ink-faint)' }}>
                           {category.code}
                         </span>
-                        <span className="min-w-0" style={{ fontSize: 'var(--fs-small)', fontWeight: 500 }}>
+                        <span className="c-name min-w-0">
                           {category.name}
                         </span>
                         {isSelected && <Check size={14} strokeWidth={2} className="ml-auto shrink-0" style={{ color: 'var(--accent)' }} aria-hidden="true" />}
