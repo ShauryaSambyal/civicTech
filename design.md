@@ -20,7 +20,7 @@ What was taken from the reference site and what was interpreted:
 | Pill geometry — `border-radius: 1000px` controls, 8px panels | Same extraction | **Observed** |
 | Fixed two-row header — 39px announcement strip + 73px nav row = 112px, solid ground, `z-index: 10` | Same extraction | **Observed** |
 | Type pairing — a serif at display scale (Simula Book, 400, −0.02em) over a grotesque body (Stkbureausans, 300–400) | Same extraction | **Observed** |
-| Font binaries | Substituted with free equivalents — Instrument Serif for Simula Book, Barlow Condensed for the form | **Substituted** |
+| Font binaries | Substituted with free equivalents — the reference's licensed Simula Book and Stkbureausans are replaced by a **single** free family, Barlow Condensed (see §4) | **Substituted** |
 | Section structure, copy hierarchy, tone, naming | Live content extracted from `boonglobal.io` | **Observed** |
 | One-page nav model, numbered/monospace eyebrow labels, hairline rules | Observed in the reference site's element breakdown | **Observed** |
 | Build stack — `Nuxt.js`, `Anime.js`, `Sanity` | Awwwards nominee listing for Boon Global (Milkshake Studio, Sep 2026) | **Observed** |
@@ -51,11 +51,14 @@ Design moves worth naming, because they are the whole style:
 - **One idea per screen.** Sections are separated by large vertical voids, not boxes.
 - **Type does the work.** No decorative colour; scale, weight and tracking carry
   hierarchy. Headlines are tight (`-0.03em`) and set close to `line-height: 1`.
+  *Our adaptation keeps the principle and inverts the mechanism* — one family,
+  positive tracking (§4).
 - **Monochrome canvas.** Near-black ground, warm off-white ink. Colour appears only
   as a signal, never as decoration.
 - **Hairlines, not cards.** Structure is drawn with 1px rules and edges.
 - **Microcopy as instrumentation.** Small monospace, uppercase labels with wide
   tracking mark every section and metadata field — read-outs, not ornament.
+  *Ours keep the size and the tracking in the single family (§4).*
 - **Restraint in motion.** Slow, sparse, one moment at a time. No looping ambient
   animation behind content.
 
@@ -147,60 +150,84 @@ that attention, it is wrong.
 **Legacy brand ramp retired.** The old `--crimson / --orange / --blue / --sky…`
 gradient ramp, gradient hairline (`.surface-lit`), sheen (`.btn-sheen`), glow
 (`--ambient-*`) and `gradient-text` utilities are **removed**. Category and status
-identity now comes from `--accent` plus monospace label text, not from hue.
+identity now comes from `--accent` plus micro label text — uppercase, weight 600,
+wide tracking — not from hue.
 
 ---
 
 ## 4. Typography
 
-| Role | Family | Weights | Notes |
-| ---- | ------ | ------- | ----- |
-| Display | `Instrument Serif` (Google Fonts) | 400 (+ italic) | Heroes and section titles **only**. The reference sets its headlines in a serif (Simula Book) over a sans body; this is the free equivalent. |
-| Body | `Inter Tight` | 300 / 400 / 500 / 600 | Prose, interface text, form values, buttons |
-| Mono | `IBM Plex Mono` | 400 / 500 | Eyebrows, section numbers, metadata, figures, chips, category codes |
-| Form | `Barlow Condensed` | 400 / 500 / 600 | The incident report form, and only that section (see below) |
+**One family, site-wide: Barlow Condensed.** There is no second typeface anywhere —
+display, body, labels, controls and figures are all the same voice. Role is carried
+entirely by weight, size and tracking. This is a deliberate departure from the
+reference's serif-over-grotesque pairing, and the one place this site does not
+follow it.
 
-Tokens: `--font-display`, `--font-sans`, `--font-mono`, `--font-form`.
+| Role | Weight | Size | Tracking |
+| ---- | ------ | ---- | -------- |
+| Display — hero `<h1>`, `h2`–`h4`, `.display` | **600** | `--fs-hero` / `--fs-h2` | `0.01em` |
+| Lead — section intros, hero subcopy | 400 | `--fs-lead` | `0.012em` |
+| Body — prose, values, table content | 400 | `--fs-body` | `0.012em` |
+| Controls — `.btn`, chips, choice tiles | 600 | `0.9375rem` | `0.045em` |
+| Labels — `.label`, `.eyebrow` | 600 | `--fs-micro`, uppercase | `0.16em` / `0.2em` |
+| Figures — `.tabular` | 500 | inherits | `0.01em` |
 
-### The incident report form — one family, one weight per role
+Tokens: `--font-condensed` is the one stack; `--font-sans`, `--font-display`,
+`--font-mono` and `--font-form` all alias it, so every existing rule keeps working
+while there is exactly one family to change.
 
-Section 03 is wrapped in `.form-condensed` and switches entirely to Barlow
-Condensed. The weights are not decorative; each one marks a job:
+Because a condensed face sets narrower and reads smaller at any given size, the whole
+scale runs **one step larger** than it would in a grotesque (see the table below).
 
-| Weight | Role |
-| ------ | ---- |
-| **600** | The section heading, every field label, and the submit action |
-| **500** | Category tiles, counters, footnotes |
-| **400** | What the reader types — inputs, textarea, placeholder |
+### Negative tracking is gone
 
-Two things deliberately stay monospaced, because they are data rather than prose:
-the category codes (`RDS`, `SAN`, `LGT`…) and the `n/4` completion counter. Because
-the panel is white paper, the fields inside it carry their own warm tone
-(`color-mix(in srgb, var(--ink) 4%, var(--bg-2))`) and a firmer hairline, so an
-input never reads as empty space.
+A condensed face is already tight. Pulling the tracking in further makes letters touch
+and turns a paragraph into a block. So every display and label rule is now
+**positive** — `0.01em` at display scale, up to `0.2em` on uppercase micro labels. A
+negative `letter-spacing` in this codebase is left over from an earlier design, not a
+decision.
+
+### Figures without a monospace family
+
+`.tabular` keeps `font-variant-numeric: tabular-nums` + `font-feature-settings: "tnum"`,
+and Barlow Condensed honours both — verified by measurement: every digit has the same
+advance, so `1111` and `1010` are exactly the same width and columns of figures stay
+aligned without a monospace face. Codes (`RDS`, `SAN`, `LGT`…) and the `n/4` counter
+read as data through **tracking and weight** — 600 at `0.16em` — rather than through a
+second family.
+
+### The incident report form
+
+Section 03 is wrapped in `.form-condensed`, but it is no longer a typographic island.
+With the whole site in one family it keeps only what is genuinely form-specific: the
+white paper panel, fields one step larger at `1.0625rem`, the fields' own warm tone
+(`color-mix(in srgb, var(--ink) 4%, var(--bg-2))`) and a firmer hairline so an input
+never reads as empty space, and an uppercase submit. Its weight ladder is the site's:
+**600** for the action, labels and category codes, **500** for tiles and counters,
+**400** for what the reader types.
 
 ### Scale (fluid, rem)
 
 | Token | Size | Applied to |
 | ----- | ---- | ---------- |
-| `--fs-hero` | `clamp(2.5rem, 5.2vw, 3.75rem)` | Hero `<h1>` — 60px at 1440 (the reference sets 56px) |
-| `--fs-h2` | `clamp(1.75rem, 3.2vw, 2.5rem)` | Section headings |
-| `--fs-h3` | `1.0625rem` | Card titles |
-| `--fs-lead` | `clamp(1rem, 1.35vw, 1.1875rem)` | Section intros, hero subcopy |
-| `--fs-body` | `0.9375rem` | Default text |
-| `--fs-small` | `0.8125rem` | Metadata, helper text |
-| `--fs-micro` | `0.6875rem` | Eyebrows, chips, table labels |
+| `--fs-hero` | `clamp(2.625rem, 5.8vw, 4rem)` | Hero `<h1>` — 64px at 1440 |
+| `--fs-h2` | `clamp(1.875rem, 3.4vw, 2.75rem)` | Section headings — 44px at 1440 |
+| `--fs-h3` | `1.125rem` | Card titles |
+| `--fs-lead` | `clamp(1.0625rem, 1.45vw, 1.3125rem)` | Section intros, hero subcopy |
+| `--fs-body` | `1rem` | Default text |
+| `--fs-small` | `0.875rem` | Metadata, helper text |
+| `--fs-micro` | `0.75rem` | Eyebrows, chips, table labels |
 
 Rules:
 
-- Display/heading tracking `-0.015em` (`-0.02em` on the hero); display
-  `line-height: 1.06–1.1`. The display serif is always weight **400** — it ships
-  one weight, and synthetic bolding makes it look broken.
-- Body text `line-height: 1.65`, measure capped at **68ch**.
-- `.eyebrow` = mono, `--fs-micro`, uppercase, `letter-spacing: 0.18em`,
-  `--ink-faint`. Prefix with a section number: `01 — Overview`.
-- Figures use `.tabular` (`font-variant-numeric: tabular-nums`) and are set in
-  **mono** so columns align.
+- Display/heading tracking `+0.01em`, `line-height: 1.05`, weight **600**. There
+  is no light or thin display weight: condensed type already reads quiet at scale,
+  and anything under 500 disappears on the cream ground.
+- Body text `line-height: 1.7`, tracking `+0.012em`, measure capped at **68ch**.
+- `.eyebrow` = `--fs-micro`, uppercase, `letter-spacing: 0.2em`, `--ink-faint`.
+  Prefix with a section number: `01 — Overview`.
+- Figures use `.tabular`; alignment comes from the font's own **tabular numerals**,
+  not from a monospace advance.
 - No gradient-clipped text, no text shadows, no italic display copy.
 
 ---
@@ -244,8 +271,8 @@ Rules:
 - **Row 2 — the nav itself.** Wordmark left, section rail centre, account cluster right.
 - Scrolled (`scrollY > 8`): a bottom hairline appears, plus a soft shadow. Nothing
   moves or resizes — the header is stable chrome, not a shrinking bar.
-- Brand = wordmark only (`Civic` in `--ink`, `Tech` in `--ink-muted`) in the display
-  serif at 1.5rem. No gradient text, no animated logo tile.
+- Brand = wordmark only (`Civic` in `--ink`, `Tech` in `--ink-muted`) at 1.5rem,
+  weight 600, `0.025em` tracking. No gradient text, no animated logo tile.
 - Nav items are **anchor links** to `#overview · #issues · #report · #analytics ·
   #account`. At rest they are `--ink-faint`; the active one is `--ink`, with a 2px
   `--accent` underline that **slides** between items rather than fading per item.
@@ -263,7 +290,7 @@ breakpoint-gated own their rule: `.btn-icon.md-hidden`.
 ### Buttons
 | Class | Look |
 | ----- | ---- |
-| `.btn` | body-family label at 0.875rem — no uppercase, no mono — `--radius-pill`, `padding: 0.72rem 1.35rem` |
+| `.btn` | label at 0.9375rem, weight 600, `0.045em` tracking, sentence case (uppercase only on the form submit) — `--radius-pill`, `padding: 0.72rem 1.35rem` |
 | `.btn-primary` | **`background: var(--accent)`**, `color: var(--accent-ink)`, no border. The page's one filled pill. |
 | `.btn-ghost` | transparent, `1px solid var(--rule-strong)`, `--ink`; hover → `--surface-hover` |
 | `.btn-quiet` | text-only, `--ink-muted`, hover → `--ink` |
@@ -279,8 +306,8 @@ hover = border/colour shift only.
   at rest → `grayscale(0)` on hover (`0.6s`). This is the signature image treatment.
 
 ### Forms
-- Labels above fields: mono, `--fs-micro`, uppercase, `0.14em`, `--ink-faint`;
-  required marker in `--accent`.
+- Labels above fields: `--fs-micro`, weight 600, uppercase, `0.16em`,
+  `--ink-faint`; required marker in `--accent`.
 - `.field`: transparent fill, 1px `--rule`, `--radius`, `--fs-body`, `0.75rem 0.875rem`
   padding. Focus → `--rule-strong` border + 3px `--accent-soft` ring. Errors use
   `--accent` text, never a red background.
@@ -289,8 +316,8 @@ hover = border/colour shift only.
   a small accent dot and `--ink` label.
 
 ### Chips, status & progress
-- `.chip` = mono `--fs-micro`, uppercase, `0.12em`, pill, 1px `--rule`, transparent
-  fill, `--ink-muted` text.
+- `.chip` = `--fs-micro`, weight 600, uppercase, `0.14em`, pill, 1px `--rule`,
+  transparent fill, `--ink-muted` text.
 - Status is a chip whose leading element is a 6px dot: reported = `--accent`,
   in-progress = `--ink-muted`, resolved = `--ink`. Hue carries no meaning — shape
   and label do, so it survives greyscale and colour-blind viewing.
@@ -298,8 +325,8 @@ hover = border/colour shift only.
   (or `--accent` once, for the resolution ring). No shimmer animation.
 
 ### Figures / stats
-- Big numbers: display face or mono, `--ink`, `clamp(1.75rem, 4vw, 2.5rem)`,
-  tabular. Label below in mono `--fs-micro` uppercase `--ink-faint`.
+- Big numbers: weight 500, tabular numerals, `--ink`, `clamp(1.75rem, 4vw, 2.5rem)`.
+  Label below in `--fs-micro`, uppercase, `--ink-faint`.
 - The four-tile stat row from the old design becomes a **single hairline strip**:
   four cells separated by 1px rules, no individual coloured fills.
 
@@ -307,23 +334,23 @@ hover = border/colour shift only.
 - Backdrop `rgba(8,9,10,0.72)` + `blur(10px)`; panel `--bg-2`, 1px `--rule`,
   `--radius`, `--shadow-overlay`.
 - Media header as in cards, with a bottom scrim to `--bg-2`; square icon close button.
-- Metadata renders as a hairline-separated definition list: mono label above,
+- Metadata renders as a hairline-separated definition list: micro label above,
   `--ink` value below.
 
 ### Toasts
 - `--bg-2` panel, 1px `--rule`, `--radius`, left edge 3px in tone colour
-  (`--accent` error, `--ink` success/info). Mono tone label, body text `--ink`.
+  (`--accent` error, `--ink` success/info). Micro tone label, body text `--ink`.
 - Bottom-right on desktop, full-width above the fold on mobile.
 
 ### Footer
-- Top hairline, mono `--fs-small` in `--ink-faint`, brand wordmark in `--ink`.
+- Top hairline, `--fs-small` in `--ink-faint`, brand wordmark in `--ink`.
 - One line of copy plus a live count. No gradient hairline.
 
 ---
 
 ### Backing control
 - A report is **backed**, not upvoted. The control is a pill: a 13px arrow plus the
-  count in mono. Backed state is `--accent` text on an `--accent-soft` fill with a
+  count in tabular figures. Backed state is `--accent` text on an `--accent-soft` fill with a
   `color-mix` accent hairline. Never a filled badge, never a heart.
 - One backing per account, enforced by the database (see §10), so the control is a
   toggle — pressing it again withdraws the backing.
@@ -582,15 +609,15 @@ security rules in `firestore.rules` and `storage.rules` are the boundary, and
 | -- | ----- |
 | Let one sentence own the hero | Pack the hero with three CTAs and a badge row |
 | Separate sections with void and a rule | Wrap each section in a glowing card |
-| Use mono labels for instrumentation | Use emoji as interface iconography |
+| Use micro labels (uppercase, wide tracking) for instrumentation | Use emoji as interface iconography |
 | Draw attention with `--accent` on ≤5% of pixels | Gradient-fill a surface |
 | Use greyscale imagery with a hover reveal | Tint every image |
 | Animate on scroll once, slowly | Loop any background animation |
 | Set 1px rules and 2px radii | Round to 16px and stack shadows |
 | Keep every real secret in the gitignored `.env` | Put a service key in a `VITE_*` variable |
 | Let the security rules enforce one backing per account | Trust the interface to police the count |
-| Let the serif speak only in headlines | Set body copy, labels or buttons in the display serif |
+| Carry hierarchy with weight, size and tracking in one family | Reach for a second typeface to signal a change of role |
 | Wear the cream page by default | Flip the default to dark and call it the reference |
 | Spend the accent on one filled pill per view | Fill two buttons and let them compete |
-| Keep the incident form in Barlow Condensed, 400/500/600 | Mix a fourth family into it |
+| Keep every voice in Barlow Condensed | Give the form, the nav or the figures a family of their own |
 | Treat a stalled animation as a bug in the layout | Assume frames are always being delivered |

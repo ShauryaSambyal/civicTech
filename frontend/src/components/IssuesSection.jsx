@@ -68,7 +68,7 @@ function IssueCard({ issue, user, onOpen, onToggleLike, onRequestSignIn }) {
           {issue.code}
         </span>
 
-        <h3 className="text-body mt-2.5" style={{ fontSize: 'var(--fs-h3)', letterSpacing: '-0.02em' }}>
+        <h3 className="text-body mt-2.5" style={{ fontSize: 'var(--fs-h3)', letterSpacing: '0.01em' }}>
           {issue.title}
         </h3>
 

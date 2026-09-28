@@ -99,7 +99,7 @@ export default function AuthModal({ open, onClose, reason }) {
           <h2
             id="auth-title"
             className="text-body mt-6"
-            style={{ fontSize: '1.5rem', letterSpacing: '-0.03em' }}
+            style={{ fontSize: '1.5rem', letterSpacing: '0.015em' }}
             data-modal-row
           >
             {isConfigured ? 'Sign in to keep your record' : 'Accounts are not connected yet'}

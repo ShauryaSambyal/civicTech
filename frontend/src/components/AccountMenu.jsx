@@ -126,11 +126,11 @@ export default function AccountMenu({ onRequestSignIn, myCount = 0, backedCount 
           <div className="grid grid-cols-2 gap-px my-1" style={{ background: 'var(--rule)' }}>
             <div className="px-3 py-2.5" style={{ backgroundColor: 'var(--bg-2)' }}>
               <p className="tabular text-body leading-none" style={{ fontSize: '1.125rem' }}>{myCount}</p>
-              <p className="label" style={{ margin: '0.4rem 0 0', fontSize: '0.5625rem' }}>Filed</p>
+              <p className="label" style={{ margin: '0.4rem 0 0', fontSize: '0.6875rem' }}>Filed</p>
             </div>
             <div className="px-3 py-2.5" style={{ backgroundColor: 'var(--bg-2)' }}>
               <p className="tabular text-body leading-none" style={{ fontSize: '1.125rem' }}>{backedCount}</p>
-              <p className="label" style={{ margin: '0.4rem 0 0', fontSize: '0.5625rem' }}>Backed</p>
+              <p className="label" style={{ margin: '0.4rem 0 0', fontSize: '0.6875rem' }}>Backed</p>
             </div>
           </div>
 

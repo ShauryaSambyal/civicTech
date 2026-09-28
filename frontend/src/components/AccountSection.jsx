@@ -168,7 +168,7 @@ export default function AccountSection({
                     )}
                   </span>
                   <div className="min-w-0">
-                    <p className="text-body truncate" style={{ fontSize: 'var(--fs-h3)', fontWeight: 500, letterSpacing: '-0.02em' }}>
+                    <p className="text-body truncate" style={{ fontSize: 'var(--fs-h3)', fontWeight: 500, letterSpacing: '0.012em' }}>
                       {displayName(user)}
                     </p>
                     <p className="text-faint truncate mt-1" style={{ fontSize: 'var(--fs-small)' }}>
@@ -227,7 +227,7 @@ export default function AccountSection({
               <div className="mt-12 grid gap-5 lg:grid-cols-2" data-anim="stagger">
                 <div className="surface p-6 sm:p-8">
                   <div className="flex items-baseline justify-between gap-4">
-                    <h3 className="text-body" style={{ fontSize: 'var(--fs-h3)', letterSpacing: '-0.02em' }}>
+                    <h3 className="text-body" style={{ fontSize: 'var(--fs-h3)', letterSpacing: '0.01em' }}>
                       Reports you filed
                     </h3>
                     <span className="tabular" style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-faint)', letterSpacing: '0.14em' }}>
@@ -257,7 +257,7 @@ export default function AccountSection({
 
                 <div className="surface p-6 sm:p-8">
                   <div className="flex items-baseline justify-between gap-4">
-                    <h3 className="text-body" style={{ fontSize: 'var(--fs-h3)', letterSpacing: '-0.02em' }}>
+                    <h3 className="text-body" style={{ fontSize: 'var(--fs-h3)', letterSpacing: '0.01em' }}>
                       Reports you backed
                     </h3>
                     <span className="tabular" style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-faint)', letterSpacing: '0.14em' }}>

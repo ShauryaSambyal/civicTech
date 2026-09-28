@@ -29,7 +29,7 @@ export default function Footer({ issues }) {
 
         <div className="grid gap-10 md:grid-cols-3" data-anim="stagger">
           <div>
-            <h2 className="text-body" style={{ fontSize: 'var(--fs-h3)', letterSpacing: '-0.02em' }}>
+            <h2 className="text-body" style={{ fontSize: 'var(--fs-h3)', letterSpacing: '0.01em' }}>
               Who keeps this running
             </h2>
             <p className="text-soft mt-4 measure" style={{ fontSize: 'var(--fs-small)' }}>
@@ -82,11 +82,11 @@ export default function Footer({ issues }) {
           <p className="flex items-baseline gap-[2px]" style={{ fontSize: 'var(--fs-small)' }}>
             <span
               className="text-body"
-              style={{ fontFamily: 'var(--font-display)', fontWeight: 600, letterSpacing: '-0.03em' }}
+              style={{ fontFamily: 'var(--font-display)', fontWeight: 600, letterSpacing: '0.02em' }}
             >
               Civic
             </span>
-            <span className="text-faint" style={{ fontFamily: 'var(--font-display)', fontWeight: 600, letterSpacing: '-0.03em' }}>
+            <span className="text-faint" style={{ fontFamily: 'var(--font-display)', fontWeight: 600, letterSpacing: '0.02em' }}>
               Tech
             </span>
             <span className="text-faint ml-2">— built so neighbours can fix things together.</span>

@@ -303,7 +303,7 @@ const Navbar = ({
             <a
               href="#overview"
               className="shrink-0 transition-opacity duration-200 hover:opacity-70"
-              style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', letterSpacing: '-0.01em' }}
+              style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 600, letterSpacing: '0.025em' }}
             >
               <span className="text-body">Civic</span>
               <span className="text-faint">Tech</span>
@@ -329,7 +329,7 @@ const Navbar = ({
                     className="relative z-10 flex items-center h-full gap-2 text-faint transition-colors duration-200 hover:text-body"
                     style={{ color: isActive ? 'var(--ink)' : undefined }}
                   >
-                    <span className="tabular" style={{ fontSize: '0.625rem', opacity: 0.7 }}>{index}</span>
+                    <span className="tabular" style={{ fontSize: '0.6875rem', opacity: 0.7 }}>{index}</span>
                     <span className="link-sweep" style={{ fontSize: 'var(--fs-small)', fontWeight: 500 }}>{label}</span>
                   </a>
                 )
@@ -391,7 +391,7 @@ const Navbar = ({
                 className="flex items-baseline gap-3 py-3 border-b text-faint transition-colors duration-200 hover:text-body"
                 style={{ borderColor: 'var(--rule)', color: activeId === id ? 'var(--ink)' : undefined }}
               >
-                <span className="tabular" style={{ fontSize: '0.625rem', opacity: 0.7 }}>{index}</span>
+                <span className="tabular" style={{ fontSize: '0.6875rem', opacity: 0.7 }}>{index}</span>
                 <span style={{ fontSize: 'var(--fs-body)', fontWeight: 500 }}>{label}</span>
               </a>
             ))}

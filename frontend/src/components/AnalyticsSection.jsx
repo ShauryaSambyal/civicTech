@@ -148,7 +148,7 @@ export default function AnalyticsSection({ index, label, issues }) {
 
           <div className="surface p-6 sm:p-8">
             <div className="flex items-baseline justify-between gap-4 mb-8">
-              <h3 className="text-body" style={{ fontSize: 'var(--fs-h3)', letterSpacing: '-0.02em' }}>By category</h3>
+              <h3 className="text-body" style={{ fontSize: 'var(--fs-h3)', letterSpacing: '0.01em' }}>By category</h3>
               <span className="tabular" style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-faint)', letterSpacing: '0.14em' }}>
                 {issues.length} REPORTS
               </span>
@@ -169,7 +169,7 @@ export default function AnalyticsSection({ index, label, issues }) {
 
           <div className="surface p-6 sm:p-8">
             <div className="flex items-baseline justify-between gap-4 mb-8">
-              <h3 className="text-body" style={{ fontSize: 'var(--fs-h3)', letterSpacing: '-0.02em' }}>By status</h3>
+              <h3 className="text-body" style={{ fontSize: 'var(--fs-h3)', letterSpacing: '0.01em' }}>By status</h3>
               <span className="tabular" style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-faint)', letterSpacing: '0.14em' }}>
                 {resolutionRate}% CLOSED
               </span>
