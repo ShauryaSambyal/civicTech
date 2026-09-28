@@ -46,6 +46,37 @@ const MESSAGES = {
 export const errorCode = (error) => (error && (error.code || error.name)) || '';
 
 /**
+ * `auth/unauthorized-domain` is the one sign-in failure that is guaranteed by
+ * the project's configuration rather than by anything the user did, and it is
+ * the likeliest one on a fresh checkout — Firebase pre-authorises `localhost`
+ * but not `127.0.0.1` or a deployed host. So the message names the exact host
+ * to add, and mentions the zero-config workaround of opening the site via
+ * `localhost` (any port — only the hostname is checked).
+ */
+function unauthorizedDomainMessage() {
+  let host = 'this domain';
+  try {
+    if (typeof window !== 'undefined' && window.location?.hostname) {
+      host = window.location.hostname;
+    }
+  } catch {
+    /* non-browser context: keep the generic wording */
+  }
+  let localhostHint = 'http://localhost';
+  try {
+    const port = typeof window !== 'undefined' ? window.location?.port : '';
+    if (port) localhostHint = `${localhostHint}:${port}`;
+  } catch {
+    /* non-browser context */
+  }
+  return (
+    `Google sign-in is not allowed from “${host}” yet. In the Firebase console, open ` +
+    `Authentication → Settings → Authorized domains, add “${host}”, and save. ` +
+    `Until then, opening this site via ${localhostHint} works with no console change.`
+  );
+}
+
+/**
  * A message worth showing the user, or `null` when the error is one we
  * deliberately stay quiet about (the user cancelled).
  */
@@ -53,5 +84,6 @@ export function friendlyError(error, fallback) {
   const code = errorCode(error);
   if (!code) return fallback || 'Something went wrong. Please try again.';
   if (code === 'auth/cancelled-popup-request') return null;
+  if (code === 'auth/unauthorized-domain') return unauthorizedDomainMessage();
   return MESSAGES[code] || error?.message || fallback || 'Something went wrong. Please try again.';
 }

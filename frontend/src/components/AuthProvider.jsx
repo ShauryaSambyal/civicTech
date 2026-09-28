@@ -22,6 +22,11 @@ export default function AuthProvider({ children }) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState(null);
 
+  /* Stable identity: the modal clears on open via its own effect keyed on
+     `open`, not on `clearError` — a changing identity here would make that
+     effect re-run whenever an error lands, wiping it one render later. */
+  const clearError = useCallback(() => setError(null), []);
+
   useEffect(() => {
     if (!isFirebaseConfigured) return undefined;
 
@@ -81,9 +86,9 @@ export default function AuthProvider({ children }) {
       isDemo: Boolean(user?.isDemo),
       signInWithGoogle,
       signOutUser,
-      clearError: () => setError(null)
+      clearError
     }),
-    [user, loading, pending, error, signInWithGoogle, signOutUser]
+    [user, loading, pending, error, signInWithGoogle, signOutUser, clearError]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

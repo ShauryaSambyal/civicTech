@@ -57,8 +57,11 @@ anything else.
 ## 4. Authorise your domains
 
 **Authentication → Settings → Authorized domains.** `localhost` is there by
-default. When you deploy, add your real domain (`civictech.example.com`) or
-sign-in will fail with `auth/unauthorized-domain`.
+default — but **`127.0.0.1` is not**, and a dev server opened by its IP will
+fail Google sign-in with `auth/unauthorized-domain`. Either add `127.0.0.1`
+(as a domain — no port), or simply open the app via `http://localhost:<port>`.
+When you deploy, add your real domain (`civictech.example.com`) the same way,
+or sign-in will fail with the same error.
 
 ## 5. Create the database
 
